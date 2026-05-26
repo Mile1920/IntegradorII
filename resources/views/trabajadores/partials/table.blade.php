@@ -2,6 +2,7 @@
     <table class="table table-hover">
         <thead class="text-primary">
             <tr>
+                <th style="width:50px;">Foto</th>
                 <th>CI</th>
                 <th>Nombre Completo</th>
                 <th>Email</th>
@@ -16,6 +17,13 @@
         <tbody>
             @forelse($trabajadores as $t)
             <tr>
+                <td>
+                    @if($t->foto_perfil)
+                        <img src="{{ asset('storage/'.$t->foto_perfil) }}" alt="Foto" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">
+                    @else
+                        <img src="{{ asset('img/default-avatar.svg') }}" alt="Sin foto" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">
+                    @endif
+                </td>
                 <td>{{ $t->ci }}</td>
                 <td><strong>{{ $t->nombre_completo }}</strong></td>
                 <td>{{ $t->email }}</td>

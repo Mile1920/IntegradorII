@@ -25,13 +25,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Dashboard principal
     Route::get('/dashboard', function () {
-        $trabajadoresActivos = \App\Models\Trabajador::where('activo', true)->count();
-        $incidentesAbiertos = \App\Models\Incidente::where('estado', 'abierto')->count();
-        $sensorRecientes = \App\Models\SensorData::where('created_at', '>=', now()->subDay())->count();
+        $user = auth()->user();
+        $esAdminArea = $user->hasRole('administrador-area');
+        $areaId = $esAdminArea && $user->trabajador ? $user->trabajador->area_id : null;
 
-        // Datos recientes para mostrar en dashboard
-        $recentIncidentes = \App\Models\Incidente::with('area')->orderBy('created_at', 'desc')->limit(6)->get();
-        $recentTrabajadores = \App\Models\Trabajador::with('area','cargo')->orderBy('created_at', 'desc')->limit(6)->get();
+        if ($areaId) {
+            $trabajadoresActivos = \App\Models\Trabajador::where('activo', true)->where('area_id', $areaId)->count();
+            $incidentesAbiertos = \App\Models\Incidente::where('estado', 'abierto')->where('area_id', $areaId)->count();
+            $sensorRecientes = \App\Models\SensorData::where('created_at', '>=', now()->subDay())->count();
+            $recentIncidentes = \App\Models\Incidente::with('area')->where('area_id', $areaId)->orderBy('created_at', 'desc')->limit(6)->get();
+            $recentTrabajadores = \App\Models\Trabajador::with('area','cargo')->where('area_id', $areaId)->orderBy('created_at', 'desc')->limit(6)->get();
+        } else {
+            $trabajadoresActivos = \App\Models\Trabajador::where('activo', true)->count();
+            $incidentesAbiertos = \App\Models\Incidente::where('estado', 'abierto')->count();
+            $sensorRecientes = \App\Models\SensorData::where('created_at', '>=', now()->subDay())->count();
+            $recentIncidentes = \App\Models\Incidente::with('area')->orderBy('created_at', 'desc')->limit(6)->get();
+            $recentTrabajadores = \App\Models\Trabajador::with('area','cargo')->orderBy('created_at', 'desc')->limit(6)->get();
+        }
 
         // Series simples para sparkline: últimos 12 periodos (horas)
         $labels = [];
@@ -87,6 +97,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/firebase-sensors/{sensorId}', [App\Http\Controllers\FirebaseSensorController::class, 'show'])->name('firebase-sensors.show');
         Route::get('/sensor-dashboard', [App\Http\Controllers\FirebaseSensorController::class, 'dashboard'])->name('sensor-dashboard');
         Route::get('/api/firebase-sensors', [App\Http\Controllers\FirebaseSensorController::class, 'apiData'])->name('api.firebase-sensors');
+    });
+
+    // Estadísticas avanzadas (solo administradores)
+    Route::middleware('role:administrador-principal|administrador-area')->group(function () {
+        Route::get('/estadisticas', [App\Http\Controllers\EstadisticasController::class, 'index'])->name('estadisticas.index');
     });
 
     // Reportes generales (placeholder)

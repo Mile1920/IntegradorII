@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\SystemBackupCommand::class,
+        \App\Console\Commands\AlertarSalidaPendiente::class,
     ];
 
     /**
@@ -21,11 +22,16 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Backup lógico diario de la información crítica del sistema
+        // Backup lógico cada 48 horas de la información crítica del sistema
         $schedule->command('system:backup')
-            ->dailyAt('02:00')
+            ->cron('0 2 */2 * *')
             ->withoutOverlapping()
             ->onOneServer();
+
+        // Alerta cada hora si hay ingresos sin salida después de 8 horas
+        $schedule->command('alertar:salida-pendiente')
+            ->hourly()
+            ->withoutOverlapping();
     }
 
     /**

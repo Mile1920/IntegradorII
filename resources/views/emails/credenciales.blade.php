@@ -11,6 +11,7 @@ Tu cuenta ha sido creada exitosamente en el **Sistema de Gestión de Personal de
 |-------|-------|
 | **Usuario (Email)** | {{ $trabajador->email }} |
 | **Contraseña temporal** | `{{ $password }}` |
+| **PIN (N° Ficha)** | `{{ $trabajador->pin ?? 'Sin asignar' }}` |
 
 <x-mail::button :url="url('/login')" color="primary">
 Ingresar al Sistema
@@ -25,6 +26,7 @@ Ingresar al Sistema
 - **Área:** {{ $trabajador->area->nombre ?? 'No asignada' }}
 - **Cargo:** {{ $trabajador->cargo->nombre ?? 'No asignado' }}
 - **Turno:** {{ ucfirst($trabajador->turno ?? 'No asignado') }}
+- **PIN (N° Ficha):** `{{ $trabajador->pin ?? 'Sin asignar' }}` — Usa este PIN para registrar tu ingreso y salida
 
 Si tienes alguna duda o necesitas asistencia, contáctanos a: **admin@minaporco.com**
 

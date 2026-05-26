@@ -91,6 +91,16 @@
                 </li>
             @endif
 
+            <!-- Estadísticas -->
+            @if(auth()->user()->hasAnyRole(['administrador-principal', 'administrador-area']))
+                <li class="nav-item {{ request()->routeIs('estadisticas.index') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('estadisticas.index') }}">
+                        <img src="{{ asset('img/Logo.png') }}" alt="Estadísticas" class="icon-img">
+                        <p>Estadísticas</p>
+                    </a>
+                </li>
+            @endif
+
             <!-- Reportes -->
             @if(auth()->user()->hasRole('administrador-principal'))
                 <li class="nav-item {{ request()->routeIs('reportes.index') ? 'active' : '' }}">

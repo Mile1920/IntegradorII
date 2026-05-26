@@ -18,9 +18,6 @@
     <!-- Tu CSS personalizado -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 
-    <!-- JASNY BOOTSTRAP → NECESARIO PARA EL UPLOADER DE FOTOS BONITO -->
-    <link rel="stylesheet" href="{{ asset('assets/css/jasny-bootstrap.min.css') }}">
-
     @stack('styles')
 </head>
 <body class="{{ session('theme', 'dark-edition') }}" id="appBody">
@@ -105,9 +102,6 @@
     <script src="{{ asset('assets/js/plugins/perfect-scrollbar.jquery.min.js') }}"></script>
     <script src="{{ asset('assets/js/material-dashboard.js?v=2.1.0') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
-
-    <!-- JASNY BOOTSTRAP JS → ACTIVA EL COMPONENTE DE SUBIDA DE FOTOS -->
-    <script src="{{ asset('assets/js/plugins/jasny-bootstrap.min.js') }}"></script>
 
     @stack('scripts')
 

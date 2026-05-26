@@ -82,9 +82,15 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="form-group">
+                            <div class="form-group text-center">
                                 <label>Foto de Perfil</label>
-                                <input type="file" name="foto_perfil" class="form-control" accept="image/*">
+                                <div class="d-flex flex-column align-items-center">
+                                    <div id="photoPreview" style="width:150px;height:150px;border-radius:50%;overflow:hidden;border:3px dashed #ccc;cursor:pointer;position:relative;background:#f0f0f0;margin-bottom:8px;" onclick="document.getElementById('fotoInput').click();">
+                                        <img id="photoImg" src="{{ asset('img/default-avatar.svg') }}" alt="Foto" style="width:100%;height:100%;object-fit:cover;">
+                                        <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);color:#fff;font-size:12px;padding:4px;text-align:center;">Click para cambiar</div>
+                                    </div>
+                                    <input type="file" id="fotoInput" name="foto_perfil" accept="image/*" style="display:none;" onchange="previewFoto(event)">
+                                </div>
                                 @error('foto_perfil')<small class="text-danger">{{ $message }}</small>@enderror
                             </div>
                         </div>
@@ -154,4 +160,18 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+function previewFoto(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('photoImg').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+</script>
+@endpush
 @endsection

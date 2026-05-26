@@ -1,0 +1,188 @@
+Date : 2025-12-09 16:01:46
+Directory : c:\laragon\www\MinaPorcoIntegrador\resources
+Total : 121 files,  7288 codes, -12 comments, 551 blanks, all 7827 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| PHP        |        118 |      7,278 |        -12 |        544 |      7,810 |
+| JavaScript |          2 |          7 |          0 |          6 |         13 |
+| PostCSS    |          1 |          3 |          0 |          1 |          4 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                          | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                             |        121 |      7,288 |        -12 |        551 |      7,827 |
+| ..                                                                                                                            |         19 |       -569 |        -91 |       -109 |       -769 |
+| ..\database                                                                                                                   |         19 |       -569 |        -91 |       -109 |       -769 |
+| ..\database\factories                                                                                                         |          1 |        -25 |        -14 |         -6 |        -45 |
+| ..\database\migrations                                                                                                        |         16 |       -481 |        -64 |        -92 |       -637 |
+| ..\database\seeders                                                                                                           |          2 |        -63 |        -13 |        -11 |        -87 |
+| css                                                                                                                           |          1 |          3 |          0 |          1 |          4 |
+| js                                                                                                                            |          2 |          7 |          0 |          6 |         13 |
+| views                                                                                                                         |         99 |      7,847 |         79 |        653 |      8,579 |
+| views (Files)                                                                                                                 |          4 |        823 |         12 |         48 |        883 |
+| views\adminS                                                                                                                  |          3 |        133 |          0 |          5 |        138 |
+| views\adminS\areas                                                                                                            |          3 |        133 |          0 |          5 |        138 |
+| views\alerts                                                                                                                  |          1 |        250 |          3 |         15 |        268 |
+| views\areas                                                                                                                   |          3 |        170 |          0 |         12 |        182 |
+| views\auth                                                                                                                    |          6 |        321 |          3 |         65 |        389 |
+| views\cargos                                                                                                                  |          3 |        205 |          0 |         12 |        217 |
+| views\components                                                                                                              |         15 |        307 |         14 |         62 |        383 |
+| views\control-grupal                                                                                                          |          1 |        442 |         18 |         34 |        494 |
+| views\dashboard                                                                                                               |         10 |        709 |          2 |         26 |        737 |
+| views\dashboard\partials                                                                                                      |          6 |        277 |          2 |         14 |        293 |
+| views\dashboard\roles                                                                                                         |          4 |        432 |          0 |         12 |        444 |
+| views\emails                                                                                                                  |          1 |         20 |          0 |          8 |         28 |
+| views\firebase-sensors                                                                                                        |          3 |        466 |          5 |         27 |        498 |
+| views\incidentes                                                                                                              |          1 |         65 |          0 |          3 |         68 |
+| views\layouts                                                                                                                 |          5 |        321 |          9 |         45 |        375 |
+| views\layouts_brezze                                                                                                          |          3 |        145 |          0 |         24 |        169 |
+| views\mi                                                                                                                      |          7 |        391 |          0 |         29 |        420 |
+| views\modules                                                                                                                 |          2 |        210 |          0 |         17 |        227 |
+| views\profile                                                                                                                 |          5 |        337 |          0 |         61 |        398 |
+| views\profile (Files)                                                                                                         |          2 |        197 |          0 |         31 |        228 |
+| views\profile\partials                                                                                                        |          3 |        140 |          0 |         30 |        170 |
+| views\reportes                                                                                                                |         10 |      1,192 |          0 |         62 |      1,254 |
+| views\reportes (Files)                                                                                                        |          6 |        828 |          0 |         39 |        867 |
+| views\reportes\pdf                                                                                                            |          4 |        364 |          0 |         23 |        387 |
+| views\sensors                                                                                                                 |          4 |        228 |          0 |         22 |        250 |
+| views\sensors (Files)                                                                                                         |          1 |         46 |          0 |          4 |         50 |
+| views\sensors\devices                                                                                                         |          3 |        182 |          0 |         18 |        200 |
+| views\system                                                                                                                  |          1 |        310 |          0 |         28 |        338 |
+| views\tool_requests                                                                                                           |          1 |         52 |          0 |          3 |         55 |
+| views\trabajadores                                                                                                            |         10 |        750 |         13 |         45 |        808 |
+| views\trabajadores (Files)                                                                                                    |          5 |        536 |          1 |         33 |        570 |
+| views\trabajadores\partials                                                                                                   |          5 |        214 |         12 |         12 |        238 |
++-------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                                                      | language   | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\laragon\www\MinaPorcoIntegrador\database\factories\UserFactory.php                                                         | PHP        |        -25 |        -14 |         -6 |        -45 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\0001_01_01_000000_create_users_table.php                               | PHP        |        -38 |         -6 |         -6 |        -50 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\0001_01_01_000001_create_cache_table.php                               | PHP        |        -25 |         -6 |         -5 |        -36 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\0001_01_01_000002_create_jobs_table.php                                | PHP        |        -46 |         -6 |         -6 |        -58 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_11_18_155138_create_permission_tables.php                         | PHP        |       -103 |         -8 |        -24 |       -135 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_11_18_173245_create_cargos_table.php                              | PHP        |        -22 |         -6 |         -4 |        -32 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_11_18_173511_create_areas_table.php                               | PHP        |        -21 |         -6 |         -4 |        -31 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_11_18_173530_create_trabajadors_table.php                         | PHP        |        -33 |         -7 |         -4 |        -44 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_11_25_000001_create_ingresos_table.php                            | PHP        |        -23 |          0 |         -4 |        -27 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_11_25_000002_create_incidentes_table.php                          | PHP        |        -25 |          0 |         -4 |        -29 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_11_25_000003_create_sensor_data_table.php                         | PHP        |        -22 |          0 |         -4 |        -26 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_11_25_000004_create_sensors_table.php                             | PHP        |        -21 |          0 |         -4 |        -25 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_11_25_000005_create_tool_requests_table.php                       | PHP        |        -22 |          0 |         -4 |        -26 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_11_27_171638_add_turno_to_trabajadors_table.php                   | PHP        |        -19 |         -6 |         -4 |        -29 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_12_04_084853_add_trabajador_id_to_tool_requests_table.php         | PHP        |        -24 |         -7 |         -6 |        -37 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_12_04_150325_rename_subnivel_to_observacion_in_ingresos_table.php | PHP        |        -19 |         -6 |         -4 |        -29 |
+| c:\laragon\www\MinaPorcoIntegrador\database\migrations\2025_12_09_000600_add_spacing_to_sensors_table.php                     | PHP        |        -18 |          0 |         -5 |        -23 |
+| c:\laragon\www\MinaPorcoIntegrador\database\seeders\AdminUserSeeder.php                                                       | PHP        |        -50 |         -4 |         -7 |        -61 |
+| c:\laragon\www\MinaPorcoIntegrador\database\seeders\DatabaseSeeder.php                                                        | PHP        |        -13 |         -9 |         -4 |        -26 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\css\app.css                                                                      | PostCSS    |          3 |          0 |          1 |          4 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\js\app.js                                                                        | JavaScript |          4 |          0 |          4 |          8 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\js\bootstrap.js                                                                  | JavaScript |          3 |          0 |          2 |          5 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\adminS\areas\create.blade.php                                              | PHP        |         32 |          0 |          1 |         33 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\adminS\areas\edit.blade.php                                                | PHP        |         32 |          0 |          1 |         33 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\adminS\areas\index.blade.php                                               | PHP        |         69 |          0 |          3 |         72 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\alerts\index.blade.php                                                     | PHP        |        250 |          3 |         15 |        268 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\areas\create.blade.php                                                     | PHP        |         49 |          0 |          5 |         54 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\areas\edit.blade.php                                                       | PHP        |         49 |          0 |          5 |         54 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\areas\index.blade.php                                                      | PHP        |         72 |          0 |          2 |         74 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\auth\confirm-password.blade.php                                            | PHP        |         22 |          0 |          6 |         28 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\auth\forgot-password.blade.php                                             | PHP        |         21 |          0 |          5 |         26 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\auth\login.blade.php                                                       | PHP        |        178 |          3 |         29 |        210 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\auth\register.blade.php                                                    | PHP        |         42 |          0 |         11 |         53 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\auth\reset-password.blade.php                                              | PHP        |         32 |          0 |          8 |         40 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\auth\verify-email.blade.php                                                | PHP        |         26 |          0 |          6 |         32 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\business_flow.blade.php                                                    | PHP        |         70 |          0 |          8 |         78 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\cargos\create.blade.php                                                    | PHP        |         66 |          0 |          5 |         71 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\cargos\edit.blade.php                                                      | PHP        |         65 |          0 |          5 |         70 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\cargos\index.blade.php                                                     | PHP        |         74 |          0 |          2 |         76 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\application-logo.blade.php                                      | PHP        |          3 |          0 |          1 |          4 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\auth-session-status.blade.php                                   | PHP        |          6 |          0 |          2 |          8 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\confirm-modal.blade.php                                         | PHP        |         64 |          8 |         11 |         83 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\danger-button.blade.php                                         | PHP        |          3 |          0 |          1 |          4 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\dropdown-link.blade.php                                         | PHP        |          1 |          0 |          1 |          2 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\dropdown.blade.php                                              | PHP        |         30 |          0 |          5 |         35 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\input-error.blade.php                                           | PHP        |          8 |          0 |          2 |         10 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\input-label.blade.php                                           | PHP        |          4 |          0 |          2 |          6 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\modal.blade.php                                                 | PHP        |         11 |          0 |          3 |         14 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\nav-link.blade.php                                              | PHP        |          9 |          0 |          3 |         12 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\notification.blade.php                                          | PHP        |        151 |          6 |         24 |        181 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\primary-button.blade.php                                        | PHP        |          3 |          0 |          1 |          4 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\responsive-nav-link.blade.php                                   | PHP        |          9 |          0 |          3 |         12 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\secondary-button.blade.php                                      | PHP        |          3 |          0 |          1 |          4 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\components\text-input.blade.php                                            | PHP        |          2 |          0 |          2 |          4 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\control-grupal\index.blade.php                                             | PHP        |        442 |         18 |         34 |        494 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\dashboard.blade.php                                                        | PHP        |         56 |          1 |          5 |         62 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\dashboard\partials\alerts.blade.php                                        | PHP        |        119 |          2 |          6 |        127 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\dashboard\partials\detail_modal.blade.php                                  | PHP        |         16 |          0 |          1 |         17 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\dashboard\partials\quick_links.blade.php                                   | PHP        |         23 |          0 |          4 |         27 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\dashboard\partials\recent_incidentes.blade.php                             | PHP        |         32 |          0 |          1 |         33 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\dashboard\partials\recent_trabajadores.blade.php                           | PHP        |         34 |          0 |          1 |         35 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\dashboard\partials\stats.blade.php                                         | PHP        |         53 |          0 |          1 |         54 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\dashboard\roles\admin-area.blade.php                                       | PHP        |         47 |          0 |          3 |         50 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\dashboard\roles\admin-principal.blade.php                                  | PHP        |        123 |          0 |          4 |        127 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\dashboard\roles\tecnico.blade.php                                          | PHP        |        194 |          0 |          5 |        199 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\dashboard\roles\trabajador.blade.php                                       | PHP        |         68 |          0 |          0 |         68 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\emails\credenciales.blade.php                                              | PHP        |         20 |          0 |          8 |         28 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\firebase-sensors\create.blade.php                                          | PHP        |         63 |          0 |          4 |         67 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\firebase-sensors\index.blade.php                                           | PHP        |        166 |          3 |         10 |        179 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\firebase-sensors\show.blade.php                                            | PHP        |        237 |          2 |         13 |        252 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\incidentes\index.blade.php                                                 | PHP        |         65 |          0 |          3 |         68 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\layouts\app.blade.php                                                      | PHP        |        153 |          9 |         31 |        193 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\layouts\material-fixed-plugins.blade.php                                   | PHP        |          7 |          0 |          0 |          7 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\layouts\material-footers.blade.php                                         | PHP        |          7 |          0 |          0 |          7 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\layouts\material-navigations.blade.php                                     | PHP        |         24 |          0 |          0 |         24 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\layouts\material-sidebar.blade.php                                         | PHP        |        130 |          0 |         14 |        144 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\layouts_brezze\app.blade.php                                               | PHP        |         31 |          0 |          6 |         37 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\layouts_brezze\guest.blade.php                                             | PHP        |         26 |          0 |          5 |         31 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\layouts_brezze\navigation.blade.php                                        | PHP        |         88 |          0 |         13 |        101 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\mi\index.blade.php                                                         | PHP        |         93 |          0 |          6 |         99 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\mi\ingreso.blade.php                                                       | PHP        |         29 |          0 |          5 |         34 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\mi\reportar.blade.php                                                      | PHP        |         38 |          0 |          3 |         41 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\mi\reportes.blade.php                                                      | PHP        |        100 |          0 |          4 |        104 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\mi\reportes_pdf.blade.php                                                  | PHP        |         65 |          0 |          3 |         68 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\mi\salida.blade.php                                                        | PHP        |         29 |          0 |          5 |         34 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\mi\solicitar.blade.php                                                     | PHP        |         37 |          0 |          3 |         40 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\modules\index.blade.php                                                    | PHP        |         82 |          0 |         10 |         92 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\modules\mine-2d.blade.php                                                  | PHP        |        128 |          0 |          7 |        135 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\profile\change-password.blade.php                                          | PHP        |         91 |          0 |         13 |        104 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\profile\edit.blade.php                                                     | PHP        |        106 |          0 |         18 |        124 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\profile\partials\delete-user-form.blade.php                                | PHP        |         45 |          0 |         11 |         56 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\profile\partials\update-password-form.blade.php                            | PHP        |         41 |          0 |          8 |         49 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\profile\partials\update-profile-information-form.blade.php                 | PHP        |         54 |          0 |         11 |         65 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\reportes\completo.blade.php                                                | PHP        |        198 |          0 |         12 |        210 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\reportes\incidentes.blade.php                                              | PHP        |         99 |          0 |          4 |        103 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\reportes\index.blade.php                                                   | PHP        |        226 |          0 |         11 |        237 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\reportes\ingresos.blade.php                                                | PHP        |         93 |          0 |          4 |         97 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\reportes\pdf\completo.blade.php                                            | PHP        |        134 |          0 |         11 |        145 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\reportes\pdf\incidentes.blade.php                                          | PHP        |         77 |          0 |          4 |         81 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\reportes\pdf\ingresos.blade.php                                            | PHP        |         76 |          0 |          4 |         80 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\reportes\pdf\trabajadores.blade.php                                        | PHP        |         77 |          0 |          4 |         81 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\reportes\sensores.blade.php                                                | PHP        |        111 |          0 |          4 |        115 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\reportes\trabajadores.blade.php                                            | PHP        |        101 |          0 |          4 |        105 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\sensor-dashboard.blade.php                                                 | PHP        |        509 |         11 |         25 |        545 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\sensors\devices\create.blade.php                                           | PHP        |         79 |          0 |          7 |         86 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\sensors\devices\edit.blade.php                                             | PHP        |         46 |          0 |          7 |         53 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\sensors\devices\index.blade.php                                            | PHP        |         57 |          0 |          4 |         61 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\sensors\index.blade.php                                                    | PHP        |         46 |          0 |          4 |         50 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\system\status.blade.php                                                    | PHP        |        310 |          0 |         28 |        338 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\tool_requests\index.blade.php                                              | PHP        |         52 |          0 |          3 |         55 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\trabajadores\clasificacion.blade.php                                       | PHP        |        109 |          0 |          4 |        113 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\trabajadores\create.blade.php                                              | PHP        |        134 |          0 |          6 |        140 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\trabajadores\edit.blade.php                                                | PHP        |        124 |          0 |          6 |        130 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\trabajadores\index.blade.php                                               | PHP        |        110 |          1 |         14 |        125 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\trabajadores\partials\actions.blade.php                                    | PHP        |         10 |         12 |          0 |         22 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\trabajadores\partials\import.blade.php                                     | PHP        |          1 |          0 |          1 |          2 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\trabajadores\partials\modals.blade.php                                     | PHP        |         93 |          0 |          3 |         96 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\trabajadores\partials\search.blade.php                                     | PHP        |         35 |          0 |          1 |         36 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\trabajadores\partials\table.blade.php                                      | PHP        |         75 |          0 |          7 |         82 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\trabajadores\pdf.blade.php                                                 | PHP        |         59 |          0 |          3 |         62 |
+| c:\laragon\www\MinaPorcoIntegrador\resources\views\welcome.blade.php                                                          | PHP        |        188 |          0 |         10 |        198 |
+| Total                                                                                                                         |            |      7,288 |        -12 |        551 |      7,827 |
++-------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

@@ -1,0 +1,232 @@
+<?php
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AreaController;
+use App\Http\Controllers\CargoController;
+use App\Http\Controllers\TrabajadorController;
+use App\Http\Controllers\IncidenteController;
+use App\Http\Controllers\SensorController;
+use App\Http\Controllers\ControlGrupalController;
+use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\SystemController;
+use Illuminate\Support\Facades\Route;
+
+// ========================================
+// PÁGINA PÚBLICA (tu landing hermosa)
+// ========================================
+Route::get('/', function () {
+    return view('welcome');
+})->name('welcome');
+
+// ========================================
+// DASHBOARD Y MÓDULOS (solo usuarios logueados)
+// ========================================
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Dashboard principal
+    Route::get('/dashboard', function () {
+        $trabajadoresActivos = \App\Models\Trabajador::where('activo', true)->count();
+        $incidentesAbiertos = \App\Models\Incidente::where('estado', 'abierto')->count();
+        $sensorRecientes = \App\Models\SensorData::where('created_at', '>=', now()->subDay())->count();
+
+        // Datos recientes para mostrar en dashboard
+        $recentIncidentes = \App\Models\Incidente::with('area')->orderBy('created_at', 'desc')->limit(6)->get();
+        $recentTrabajadores = \App\Models\Trabajador::with('area','cargo')->orderBy('created_at', 'desc')->limit(6)->get();
+
+        // Series simples para sparkline: últimos 12 periodos (horas)
+        $labels = [];
+        $counts = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $from = now()->subHours($i+1);
+            $to = now()->subHours($i);
+            $labels[] = $to->format('H:00');
+            $counts[] = \App\Models\SensorData::where('created_at', '>=', $from)->where('created_at', '<', $to)->count();
+        }
+
+        return view('dashboard', compact(
+            'trabajadoresActivos',
+            'incidentesAbiertos',
+            'sensorRecientes',
+            'recentIncidentes',
+            'recentTrabajadores',
+            'labels',
+            'counts'
+        ));
+    })->name('dashboard');
+
+    // Centro de Alertas
+    Route::get('/alerts', [App\Http\Controllers\AlertController::class, 'index'])->name('alerts.index');
+
+    // Vista del flujo de negocio (documentación interna) - Solo administradores
+    Route::middleware('role:administrador-principal|administrador-area')->group(function () {
+        Route::get('/business-flow', function () {
+            return view('business_flow');
+        })->name('business.flow');
+        Route::get('/business-flow/mine-2d', function () {
+            return view('modules.mine-2d');
+        })->name('business.flow.mine2d');
+    });
+
+    // Módulo Sensores - ver datos (técnicos y administradores)
+    Route::middleware('role:tecnico|administrador-area|administrador-principal')->group(function () {
+        Route::get('/sensors', [SensorController::class, 'index'])->name('sensors.index');
+        // Sensor devices management (administradores)
+        Route::get('/sensors/devices', [App\Http\Controllers\SensorDeviceController::class, 'index'])->name('sensors.devices.index');
+        Route::get('/sensors/devices/create', [App\Http\Controllers\SensorDeviceController::class, 'create'])->name('sensors.devices.create');
+        Route::post('/sensors/devices', [App\Http\Controllers\SensorDeviceController::class, 'store'])->name('sensors.devices.store');
+        Route::get('/sensors/devices/{sensor}/edit', [App\Http\Controllers\SensorDeviceController::class, 'edit'])->name('sensors.devices.edit');
+        Route::put('/sensors/devices/{sensor}', [App\Http\Controllers\SensorDeviceController::class, 'update'])->name('sensors.devices.update');
+        Route::delete('/sensors/devices/{sensor}', [App\Http\Controllers\SensorDeviceController::class, 'destroy'])->name('sensors.devices.destroy');
+    });
+
+    // Módulo Sensores Firebase - datos simulados (solo administradores principales y de área)
+    Route::middleware('role:administrador-principal|administrador-area')->group(function () {
+        Route::get('/firebase-sensors', [App\Http\Controllers\FirebaseSensorController::class, 'index'])->name('firebase-sensors.index');
+        Route::get('/firebase-sensors/create', [App\Http\Controllers\FirebaseSensorController::class, 'create'])->name('firebase-sensors.create');
+        Route::post('/firebase-sensors', [App\Http\Controllers\FirebaseSensorController::class, 'store'])->name('firebase-sensors.store');
+        Route::get('/firebase-sensors/{sensorId}', [App\Http\Controllers\FirebaseSensorController::class, 'show'])->name('firebase-sensors.show');
+        Route::get('/sensor-dashboard', [App\Http\Controllers\FirebaseSensorController::class, 'dashboard'])->name('sensor-dashboard');
+        Route::get('/api/firebase-sensors', [App\Http\Controllers\FirebaseSensorController::class, 'apiData'])->name('api.firebase-sensors');
+    });
+
+    // Reportes generales (placeholder)
+    Route::middleware('role:administrador-principal|administrador-area|tecnico')->group(function () {
+        Route::get('/reportes', [App\Http\Controllers\ReporteController::class, 'index'])->name('reportes.index');
+        Route::get('/reportes/ingresos', [App\Http\Controllers\ReporteController::class, 'ingresos'])->name('reportes.ingresos');
+        Route::get('/reportes/ingresos/pdf', [App\Http\Controllers\ReporteController::class, 'ingresosPDF'])->name('reportes.ingresos.pdf');
+        Route::get('/reportes/incidentes', [App\Http\Controllers\ReporteController::class, 'incidentes'])->name('reportes.incidentes');
+        Route::get('/reportes/incidentes/pdf', [App\Http\Controllers\ReporteController::class, 'incidentesPDF'])->name('reportes.incidentes.pdf');
+        Route::get('/reportes/sensores', [App\Http\Controllers\ReporteController::class, 'sensores'])->name('reportes.sensores');
+        Route::get('/reportes/completo', [App\Http\Controllers\ReporteController::class, 'completo'])->name('reportes.completo');
+        Route::get('/reportes/completo/pdf', [App\Http\Controllers\ReporteController::class, 'completoPDF'])->name('reportes.completo.pdf');
+    });
+
+    // -------------------------------
+    // ÁREAS Y CARGOS → administrador-principal y administrador-area
+    // -------------------------------
+    Route::middleware('role:administrador-principal|administrador-area')->group(function () {
+        Route::resource('areas', AreaController::class)->parameters(['areas' => 'area']);
+        Route::resource('cargos', CargoController::class)->parameters(['cargos' => 'cargo']);
+    });
+
+    // -------------------------------
+    // TRABAJADORES → listado accesible a administrador-principal y administrador-area (solo búsqueda/visualización)
+    // -------------------------------
+    Route::middleware('role:administrador-principal|administrador-area')->group(function () {
+        Route::get('/trabajadores', [TrabajadorController::class, 'index'])->name('trabajadores.index');
+        Route::get('/trabajadores/clasificacion', [TrabajadorController::class, 'clasificacion'])->name('trabajadores.clasificacion');
+    });
+
+    // -------------------------------
+    // TRABAJADORES → administración completa para administradores
+    // -------------------------------
+    Route::middleware('role:administrador-principal|administrador-area')->group(function () {
+        // Registro de ingreso/salida y reportes por trabajador (administradores pueden hacerlo en nombre)
+        Route::post('trabajadores/{trabajador}/ingreso', [TrabajadorController::class, 'registrarIngreso'])->name('trabajadores.ingreso');
+        Route::post('trabajadores/{trabajador}/salida', [TrabajadorController::class, 'registrarSalida'])->name('trabajadores.salida');
+        Route::post('trabajadores/{trabajador}/reportar', [TrabajadorController::class, 'reportarCondicion'])->name('trabajadores.reportar');
+        Route::post('trabajadores/{trabajador}/sos', [TrabajadorController::class, 'enviarSos'])->name('trabajadores.sos');
+        Route::get('trabajadores/{trabajador}/historial-hoy', [TrabajadorController::class, 'historialHoy'])->name('trabajadores.historial.hoy');
+    });
+
+    // Solo administrador principal puede crear/editar/eliminar trabajadores
+    Route::middleware('role:administrador-principal')->group(function () {
+        Route::resource('trabajadores', TrabajadorController::class)->except(['index'])->parameters(['trabajadores' => 'trabajador']);
+    });
+
+    // -------------------------------
+    // ACCIONES DEL TRABAJADOR AUTENTICADO (registrar su propio ingreso/salida/reportes)
+    // -------------------------------
+    Route::middleware(['auth'])->group(function () {
+        // Mis acciones del trabajador (panel personal)
+        Route::get('/mi', [TrabajadorController::class, 'miDashboard'])->name('mi.index')->middleware('role:trabajador');
+        Route::get('/mi/reportes', [TrabajadorController::class, 'miReports'])->name('mi.reportes')->middleware('role:trabajador');
+        Route::post('/mi/ingreso', [TrabajadorController::class, 'registrarMiIngreso'])->name('mi.ingreso');
+        Route::get('/mi/ingreso', [TrabajadorController::class, 'showIngresoForm'])->name('mi.ingreso.form');
+        Route::post('/mi/salida', [TrabajadorController::class, 'registrarMiSalida'])->name('mi.salida');
+        Route::get('/mi/salida', [TrabajadorController::class, 'showSalidaForm'])->name('mi.salida.form');
+        Route::post('/mi/reportar', [TrabajadorController::class, 'reportarMiCondicion'])->name('mi.reportar');
+        Route::get('/mi/reportar', [TrabajadorController::class, 'showReportForm'])->name('mi.reportar.form');
+        // Solicitudes de herramientas (trabajador)
+        Route::get('/mi/solicitar', [App\Http\Controllers\ToolRequestController::class, 'create'])->name('mi.solicitar');
+        Route::post('/mi/solicitar', [App\Http\Controllers\ToolRequestController::class, 'store'])->name('mi.solicitar.store');
+    });
+
+    // -------------------------------
+    // CONTROL GRUPAL
+    // -------------------------------
+    Route::middleware('role:administrador-principal|administrador-area')->group(function () {
+        Route::get('/control-grupal', [ControlGrupalController::class, 'index'])->name('control-grupal.index');
+        Route::post('/control-grupal/ingreso', [ControlGrupalController::class, 'registrarIngresoGrupal'])->name('control-grupal.ingreso');
+        Route::post('/control-grupal/salida', [ControlGrupalController::class, 'registrarSalidaGrupal'])->name('control-grupal.salida');
+    });
+
+    // -------------------------------
+    // PERFIL DE USUARIO
+    // -------------------------------
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // -------------------------------
+    // CAMBIO DE CONTRASEÑA
+    // -------------------------------
+    Route::get('/profile/change-password', [PasswordController::class, 'edit'])->name('profile.change-password');
+    Route::patch('/profile/change-password', [PasswordController::class, 'update'])->name('profile.change-password.update');
+
+    // -------------------------------
+    // ESTADO DEL SISTEMA
+    // -------------------------------
+    Route::middleware('role:administrador-principal')->group(function () {
+        Route::get('/system/status', [SystemController::class, 'status'])->name('system.status');
+        Route::get('/system/logs', [App\Http\Controllers\LogController::class, 'index'])->name('system.logs');
+        Route::post('/system/logs/clear', [App\Http\Controllers\LogController::class, 'clear'])->name('system.logs.clear');
+        Route::get('/system/logs/download', [App\Http\Controllers\LogController::class, 'download'])->name('system.logs.download');
+    });
+});
+
+// Endpoint público para recibir datos desde sensores (si se configuran con SECRET)
+Route::post('/sensors/data', [SensorController::class, 'receive'])->name('sensors.data');
+
+// Endpoint para actualizar datos desde Firebase (para sincronización)
+Route::post('/api/firebase/sensors/update', function (\Illuminate\Http\Request $request) {
+    $firebaseService = app(\App\Services\FirebaseService::class);
+
+    $request->validate([
+        'sensor_id' => 'required|string',
+        'data' => 'required|array',
+    ]);
+
+    $success = $firebaseService->receiveSensorData($request->sensor_id, $request->data);
+
+    return response()->json([
+        'success' => $success,
+        'message' => $success ? 'Datos actualizados correctamente' : 'Error al actualizar datos'
+    ]);
+})->name('api.firebase.sensors.update');
+
+// Incidentes - para técnicos/administradores
+Route::middleware(['auth','role:tecnico|administrador-area|administrador-principal'])->group(function () {
+    Route::get('/incidentes', [IncidenteController::class, 'index'])->name('incidentes.index');
+    Route::post('/incidentes/{incidente}/update-estado', [IncidenteController::class, 'updateEstado'])->name('incidentes.updateEstado');
+    // Tool requests management (admin/tecnico)
+    Route::get('/tool-requests', [App\Http\Controllers\ToolRequestController::class, 'index'])->name('tool_requests.index');
+    Route::put('/tool-requests/{tool_request}', [App\Http\Controllers\ToolRequestController::class, 'update'])->name('tool_requests.update');
+});
+
+// ========================================
+// AUTH ROUTES (login, register, etc.)
+// ========================================
+// ========================================
+// RUTAS DE SISTEMA (backup, cache, etc.)
+// ========================================
+Route::middleware(['auth', 'role:administrador-principal'])->prefix('admin/system')->group(function () {
+    Route::post('/backup/{type?}', [App\Http\Controllers\BackupController::class, 'create'])->name('system.backup.create');
+    Route::get('/backup/list', [App\Http\Controllers\BackupController::class, 'list'])->name('system.backup.list');
+    Route::get('/backup/download/{filename}', [App\Http\Controllers\BackupController::class, 'download'])->name('system.backup.download');
+    Route::delete('/backup/{filename}', [App\Http\Controllers\BackupController::class, 'delete'])->name('system.backup.delete');
+    Route::post('/clear-cache', [App\Http\Controllers\BackupController::class, 'clearCache'])->name('system.clear-cache');
+    Route::post('/retry-jobs', [App\Http\Controllers\BackupController::class, 'retryJobs'])->name('system.retry-jobs');
+});
+
+require __DIR__.'/auth.php';

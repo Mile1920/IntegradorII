@@ -103,11 +103,20 @@
                                 <span>{{ $lectura->tipo }}: {{ json_encode($lectura->payload) }}</span>
                             </div>
                         @empty
-                            <div class="text-muted small">Sin lecturas aún</div>
-                        @endforelse
-                    </div>
-                </div>
-            </div>
+                                                <div class="text-muted small">Sin lecturas aún</div>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-info mb-0 py-2">
+                                            <strong><i class="fas fa-info-circle"></i> ¿Cómo conectar el ESP32?</strong><br>
+                                            Programá tu ESP32 para que envíe POST a <code id="esp32ApiUrlDisplay">http://192.168.1.204:8000/api/sensor/esp32</code><br>
+                                            <small>Ejemplo (Arduino): <code>HTTPClient http; http.begin("http://192.168.1.204:8000/api/sensor/esp32"); http.addHeader("Content-Type", "application/json"); http.POST("{\"device_id\":\"esp32_001\",\"tipo\":\"temperatura\",\"mediciones\":{\"temp\":25.5}}");</code></small>
+                                        </div>
+                                    </div>
+                                </div>
         </div>
     </div>
 </div>
@@ -160,12 +169,27 @@ function actualizarUIEsp32(data) {
 
     if (data.connected) {
         statusEl.innerHTML = '<span style="color:#4CAF50;font-size:1.2rem"><i class="fas fa-check-circle"></i> Conectado</span>';
-        latencyEl.textContent = data.latency_ms ? 'Latencia: ' + data.latency_ms + 'ms' : '';
         statusDiv.style.background = '#e8f5e9';
+        if (data.ultima_conexion) {
+            const d = new Date(data.ultima_conexion);
+            latencyEl.textContent = 'Último dato: ' + d.toLocaleTimeString() + ' (' + data.minutos_sin_datos + ' min atrás)';
+        } else {
+            latencyEl.textContent = '';
+        }
     } else {
         statusEl.innerHTML = '<span style="color:#f44336;font-size:1.2rem"><i class="fas fa-times-circle"></i> Desconectado</span>';
-        latencyEl.textContent = data.error || 'Sin conexión';
         statusDiv.style.background = '#ffebee';
+        const url = data.api_url || 'http://192.168.1.204:8000/api/sensor/esp32';
+        if (data.minutos_sin_datos !== null && data.minutos_sin_datos !== undefined) {
+            latencyEl.textContent = 'Sin datos desde hace ' + data.minutos_sin_datos + ' min';
+        } else {
+            latencyEl.innerHTML = 'Configurá tu ESP32 para enviar POST a: <strong>' + url + '</strong>';
+        }
+    }
+
+    const displayEl = document.getElementById('esp32ApiUrlDisplay');
+    if (displayEl && data.api_url) {
+        displayEl.textContent = data.api_url;
     }
 }
 

@@ -226,6 +226,7 @@ Route::post('/sensors/data', [SensorController::class, 'receive'])->name('sensor
 
 // Endpoint ESP32 (público, para que el ESP32 envie lecturas)
 Route::post('/api/sensor/esp32', [App\Http\Controllers\Esp32SensorController::class, 'recibir'])->name('api.sensor.esp32');
+Route::post('/api/sensor/esp32/recibir', [App\Http\Controllers\Esp32SensorController::class, 'recibir']); // alias
 Route::get('/api/sensor/esp32/health', [App\Http\Controllers\Esp32SensorController::class, 'health'])->name('api.sensor.esp32.health');
 Route::post('/api/sensor/esp32/connect', [App\Http\Controllers\Esp32SensorController::class, 'connect'])->name('api.sensor.esp32.connect');
 Route::post('/api/sensor/esp32/disconnect', [App\Http\Controllers\Esp32SensorController::class, 'disconnect'])->name('api.sensor.esp32.disconnect');

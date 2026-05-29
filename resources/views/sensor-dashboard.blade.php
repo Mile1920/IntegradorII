@@ -204,14 +204,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <div class="alert alert-info mb-0 py-2">
-                                            <strong><i class="fas fa-info-circle"></i> ¿Cómo conectar el ESP32?</strong><br>
-                                            El ESP32 debe estar en la misma red y enviar datos a <code id="esp32ApiUrlDisplay">http://192.168.1.204:8000/api/sensor/esp32</code>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -681,9 +673,7 @@ function actualizarUIEsp32(data) {
             latencyEl.textContent = 'El ESP32 no responde. Verificá que esté encendido y en la misma red.';
         }
     }
-
-    // Actualizar la URL mostrada en la ayuda
-    const displayEl = document.getElementById('esp32ApiUrlDisplay');
+}
 }
 
 function saveEsp32Config() {

@@ -26,6 +26,7 @@ class ToolRequestController extends Controller
         ]);
 
         $data['trabajador_id'] = Auth::user()->trabajador->id ?? null;
+        $data['user_id'] = Auth::id();
         ToolRequest::create($data);
 
         return redirect()->route('dashboard')->with('success','Solicitud enviada');

@@ -9,7 +9,7 @@ class ToolRequest extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['trabajador_id','area_id','herramienta','cantidad','observacion','estado'];
+    protected $fillable = ['user_id','trabajador_id','area_id','herramienta','cantidad','observacion','estado'];
 
     public function trabajador()
     {

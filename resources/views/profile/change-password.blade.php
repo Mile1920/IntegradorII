@@ -2,6 +2,28 @@
 @section('title', 'Cambiar Contraseña')
 
 @section('content')
+<style>
+.password-wrapper {
+    position: relative;
+}
+.password-wrapper input {
+    padding-right: 40px;
+}
+.toggle-eye {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #999;
+    z-index: 2;
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    padding: 0;
+}
+.toggle-eye:hover { color: #555; }
+</style>
 <div class="row">
     <div class="col-md-8">
         <div class="card">
@@ -18,7 +40,12 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Contraseña Actual *</label>
-                                <input type="password" name="current_password" class="form-control" required autocomplete="current-password">
+                                <div class="password-wrapper">
+                                    <input type="password" name="current_password" class="form-control" required autocomplete="current-password" id="current_password">
+                                    <button type="button" class="toggle-eye" onclick="togglePassword('current_password', this)" tabindex="-1">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                                 @error('current_password')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
@@ -30,7 +57,12 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Nueva Contraseña *</label>
-                                <input type="password" name="password" class="form-control" required autocomplete="new-password">
+                                <div class="password-wrapper">
+                                    <input type="password" name="password" class="form-control" required autocomplete="new-password" id="new_password">
+                                    <button type="button" class="toggle-eye" onclick="togglePassword('new_password', this)" tabindex="-1">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                                 @error('password')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
@@ -39,7 +71,12 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Confirmar Nueva Contraseña *</label>
-                                <input type="password" name="password_confirmation" class="form-control" required autocomplete="new-password">
+                                <div class="password-wrapper">
+                                    <input type="password" name="password_confirmation" class="form-control" required autocomplete="new-password" id="password_confirmation">
+                                    <button type="button" class="toggle-eye" onclick="togglePassword('password_confirmation', this)" tabindex="-1">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                                 @error('password_confirmation')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
@@ -96,6 +133,18 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    if (!input) return;
+    const isPassword = input.getAttribute('type') === 'password';
+    input.setAttribute('type', isPassword ? 'text' : 'password');
+    btn.querySelector('i').className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+}
+</script>
+@endpush
 
 
 

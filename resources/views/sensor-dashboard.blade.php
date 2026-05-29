@@ -208,8 +208,7 @@
                                     <div class="col-md-12">
                                         <div class="alert alert-info mb-0 py-2">
                                             <strong><i class="fas fa-info-circle"></i> ¿Cómo conectar el ESP32?</strong><br>
-                                            Programá tu ESP32 para que envíe POST a <code id="esp32ApiUrlDisplay">http://192.168.1.204:8000/api/sensor/esp32</code><br>
-                                            <small>Ejemplo (Arduino): <code>HTTPClient http; http.begin("http://192.168.1.204:8000/api/sensor/esp32"); http.addHeader("Content-Type", "application/json"); http.POST("{\"device_id\":\"esp32_001\",\"tipo\":\"temperatura\",\"mediciones\":{\"temp\":25.5}}");</code></small>
+                                            El ESP32 debe estar en la misma red y enviar datos a <code id="esp32ApiUrlDisplay">http://192.168.1.204:8000/api/sensor/esp32</code>
                                         </div>
                                     </div>
                                 </div>
@@ -638,9 +637,9 @@ function conectarEsp32() {
     .then(data => {
         actualizarUIEsp32(data);
         if (data.connected) {
-            showAlert('ESP32 conectado — ' + (data.mensaje || 'último dato recibido'), 'success');
+            showAlert(data.mensaje || 'ESP32 conectado', 'success');
         } else {
-            showAlert(data.mensaje || 'ESP32 sin datos recientes', 'warning');
+            showAlert(data.mensaje || 'ESP32 no responde', 'warning');
         }
     })
     .catch(() => showAlert('Error de red al conectar', 'danger'));
@@ -676,19 +675,15 @@ function actualizarUIEsp32(data) {
     } else {
         statusEl.innerHTML = '<span style="color:#f44336;font-size:1.2rem"><i class="fas fa-times-circle"></i> Desconectado</span>';
         statusDiv.style.background = '#ffebee';
-        const url = data.api_url || 'http://192.168.1.204:8000/api/sensor/esp32';
         if (data.minutos_sin_datos !== null && data.minutos_sin_datos !== undefined) {
             latencyEl.textContent = 'Sin datos desde hace ' + data.minutos_sin_datos + ' min';
         } else {
-            latencyEl.innerHTML = 'Configurá tu ESP32 para enviar POST a: <strong>' + url + '</strong>';
+            latencyEl.textContent = 'El ESP32 no responde. Verificá que esté encendido y en la misma red.';
         }
     }
 
     // Actualizar la URL mostrada en la ayuda
     const displayEl = document.getElementById('esp32ApiUrlDisplay');
-    if (displayEl && data.api_url) {
-        displayEl.textContent = data.api_url;
-    }
 }
 
 function saveEsp32Config() {

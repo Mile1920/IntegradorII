@@ -92,58 +92,70 @@ class Esp32SensorController extends Controller
         $ip = config('esp32.ip', env('ESP32_IP', '192.168.1.205'));
         $mac = config('esp32.mac', env('ESP32_MAC', '00:4B:12:35:3E:00'));
 
-        $serverIp = $_SERVER['SERVER_ADDR'] ?? gethostbyname(gethostname());
-        $serverPort = $_SERVER['SERVER_PORT'] ?? '8000';
-        $apiUrl = "http://{$serverIp}:{$serverPort}/api/sensor/esp32";
-
-        $ultimoDato = SensorData::where(function ($q) use ($mac) {
-                $q->where('device_id', 'esp32_001')
-                  ->orWhere('device_id', $mac)
-                  ->orWhere('device_id', 'ESP32-' . str_replace(':', '', $mac));
-            })
-            ->orderBy('created_at', 'desc')
-            ->first();
-
         $connected = false;
-        $ultimaConexion = null;
-        $minutosTranscurridos = null;
+        $metodo = null;
+        $puertosAbiertos = [];
 
-        if ($ultimoDato && $ultimoDato->created_at) {
-            $ultimaConexion = $ultimoDato->created_at;
-            $minutosTranscurridos = now()->diffInMinutes($ultimaConexion);
-            $connected = $minutosTranscurridos <= 10;
+        // 1. Probar conexión TCP directa al ESP32 (rápido, no necesita HTTP)
+        foreach ([80, 8080, 81, 23, 443, 5000] as $port) {
+            $errno = null;
+            $errstr = null;
+            $conn = @fsockopen($ip, $port, $errno, $errstr, 1);
+            if ($conn) {
+                fclose($conn);
+                $puertosAbiertos[] = $port;
+                $connected = true;
+                $metodo = "TCP puerto {$port}";
+                break;
+            }
+        }
+
+        // 2. Si no responde TCP, verificar si hay datos recientes en BD
+        if (!$connected) {
+            $ultimoDato = SensorData::where(function ($q) use ($mac) {
+                    $q->where('device_id', 'esp32_001')
+                      ->orWhere('device_id', $mac)
+                      ->orWhere('device_id', 'ESP32-' . str_replace(':', '', $mac));
+                })
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($ultimoDato && $ultimoDato->created_at && now()->diffInMinutes($ultimoDato->created_at) <= 10) {
+                $connected = true;
+                $metodo = 'datos_recientes';
+            }
         }
 
         if ($connected) {
             cache(['esp32_connected' => true, 'esp32_checked_at' => now()], 300);
-            Log::info("[ESP32] Conectado — último dato hace {$minutosTranscurridos}min");
+            Log::info("[ESP32] Conectado vía {$metodo}");
         } else {
-            cache(['esp32_connected' => false, 'esp32_error' => 'Sin datos recientes'], 60);
+            cache(['esp32_connected' => false, 'esp32_error' => 'No responde'], 60);
         }
 
         return response()->json([
             'connected' => $connected,
             'ip' => $ip,
             'mac' => $mac,
-            'api_url' => $apiUrl,
-            'server_ip' => $serverIp,
-            'ultima_conexion' => $ultimaConexion?->toIso8601String(),
-            'minutos_sin_datos' => $minutosTranscurridos,
+            'metodo' => $metodo,
+            'puertos_abiertos' => $puertosAbiertos,
             'mensaje' => $connected
-                ? "ESP32 conectado — último dato hace {$minutosTranscurridos} min"
-                : "Sin datos del ESP32. Configurá tu ESP32 para enviar POST a: {$apiUrl}",
+                ? "ESP32 conectado ({$metodo})"
+                : "ESP32 no responde en {$ip}. Verificá que esté encendido y en la misma red.",
             'checked_at' => now()->toIso8601String()
         ]);
     }
 
     public function status()
     {
+        $ip = config('esp32.ip', env('ESP32_IP', '192.168.1.205'));
         $mac = config('esp32.mac', env('ESP32_MAC', '00:4B:12:35:3E:00'));
 
-        $serverIp = $_SERVER['SERVER_ADDR'] ?? gethostbyname(gethostname());
-        $serverPort = $_SERVER['SERVER_PORT'] ?? '8000';
-        $apiUrl = "http://{$serverIp}:{$serverPort}/api/sensor/esp32";
+        $connected = false;
+        $ultimaConexion = null;
+        $minutosSinDatos = null;
 
+        // Verificar si hay datos recientes en BD
         $ultimoDato = SensorData::where(function ($q) use ($mac) {
                 $q->where('device_id', 'esp32_001')
                   ->orWhere('device_id', $mac)
@@ -151,10 +163,6 @@ class Esp32SensorController extends Controller
             })
             ->orderBy('created_at', 'desc')
             ->first();
-
-        $connected = false;
-        $ultimaConexion = null;
-        $minutosSinDatos = null;
 
         if ($ultimoDato && $ultimoDato->created_at) {
             $ultimaConexion = $ultimoDato->created_at;
@@ -162,6 +170,7 @@ class Esp32SensorController extends Controller
             $connected = $minutosSinDatos <= 10;
         }
 
+        // Desconexión manual tiene prioridad
         $manualDisconnect = cache('esp32_disconnected_at');
         if ($manualDisconnect && $manualDisconnect->gt($ultimaConexion ?? now()->subYear())) {
             $connected = false;
@@ -169,8 +178,7 @@ class Esp32SensorController extends Controller
 
         return response()->json([
             'connected' => $connected,
-            'ip' => config('esp32.ip', env('ESP32_IP', '192.168.1.205')),
-            'api_url' => $apiUrl,
+            'ip' => $ip,
             'ultima_conexion' => $ultimaConexion?->toIso8601String(),
             'minutos_sin_datos' => $minutosSinDatos,
             'checked_at' => now()->toIso8601String()

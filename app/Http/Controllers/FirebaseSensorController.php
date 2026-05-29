@@ -131,6 +131,12 @@ class FirebaseSensorController extends Controller
             ->get();
         $esp32Ip = config('esp32.ip', env('ESP32_IP', '192.168.1.205'));
 
+        $localSensores = \App\Models\Sensor::with('area')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $areas = \App\Models\Area::orderBy('nombre')->get();
+
         return view('sensor-dashboard', compact(
             'sensorData',
             'activeSensors',
@@ -141,7 +147,9 @@ class FirebaseSensorController extends Controller
             'avgHumidity',
             'esp32Lecturas',
             'esp32Ip',
-            'esp32Mac'
+            'esp32Mac',
+            'localSensores',
+            'areas'
         ));
     }
 

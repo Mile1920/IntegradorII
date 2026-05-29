@@ -209,6 +209,79 @@
                     </div>
                 </div>
 
+                <!-- Sensores Locales (Tabla) -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header card-header-primary d-flex align-items-center justify-content-between">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-database"></i> Sensores en Base de Datos
+                                </h5>
+                                <div>
+                                    <a href="{{ route('sensors.devices.index') }}" class="btn btn-outline-light btn-sm">
+                                        <i class="fas fa-cogs"></i> Ver Todos / Editar
+                                    </a>
+                                    <a href="{{ route('sensors.devices.create') }}" class="btn btn-success btn-sm">
+                                        <i class="fas fa-plus"></i> Agregar
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                @if($localSensores->isEmpty())
+                                    <div class="alert alert-info mb-0">No hay sensores registrados en la base de datos local.</div>
+                                @else
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Device ID</th>
+                                                    <th>Nombre</th>
+                                                    <th>Área</th>
+                                                    <th>Estado</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($localSensores as $s)
+                                                <tr>
+                                                    <td>{{ $s->id }}</td>
+                                                    <td>{{ $s->device_id }}</td>
+                                                    <td>{{ $s->nombre ?? '-' }}</td>
+                                                    <td>{{ $s->area->nombre ?? 'Sin área' }}</td>
+                                                    <td>
+                                                        @if($s->estado === 'activo')
+                                                            <span class="badge badge-success">Activo</span>
+                                                        @elseif($s->estado === 'alerta')
+                                                            <span class="badge badge-warning">Alerta</span>
+                                                        @else
+                                                            <span class="badge badge-danger">Inactivo</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ route('sensors.devices.edit', $s) }}" class="btn btn-sm btn-warning" title="Editar / Cambiar Área">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="mt-2 text-muted small">
+                                        <i class="fas fa-info-circle"></i> Total: {{ $localSensores->count() }} sensor(es)
+                                        @if(count($activeSensors ?? []) > 0)
+                                            | <i class="fas fa-fire"></i> Firebase activo: {{ count($activeSensors) }} sensor(es)
+                                        @else
+                                            | <i class="fas fa-cloud-off"></i> Firebase no disponible — los sensores se muestran desde BD local
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Gráficos -->
                 <div class="row">
                     <div class="col-md-6">

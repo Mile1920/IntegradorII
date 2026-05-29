@@ -109,7 +109,7 @@ function crearBackup() {
 function eliminarBackup(filename) {
     if (!confirm('¿Eliminar backup ' + filename + '?')) return;
 
-    fetch('{{ route("backup.delete", "") }}/' + filename, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } })
+    fetch('{{ url("api/backups") }}/' + encodeURIComponent(filename), { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } })
         .then(r => r.json())
         .then(data => {
             if (data.success) {

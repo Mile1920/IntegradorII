@@ -119,6 +119,18 @@
                         <p>Estado Sistema</p>
                     </a>
                 </li>
+                <li class="nav-item {{ request()->routeIs('backups.*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('backups.index') }}">
+                        <img src="{{ asset('img/Logo.png') }}" alt="Backups" class="icon-img">
+                        <p>Copias Seguridad</p>
+                    </a>
+                </li>
+                <li class="nav-item {{ request()->routeIs('auditoria.*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('auditoria.index') }}">
+                        <img src="{{ asset('img/Seguridad.png') }}" alt="Auditoría" class="icon-img">
+                        <p>Auditoría y Seg.</p>
+                    </a>
+                </li>
             @endif
 
             <!-- Funcionalidades del Trabajador -->

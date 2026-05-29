@@ -164,6 +164,10 @@ class FirebaseSensorController extends Controller
             'area' => 'required|string|max:100',
         ]);
 
+        // Resolver area_id desde el nombre
+        $area = \App\Models\Area::where('nombre', $request->area)->first();
+        $areaId = $area ? $area->id : null;
+
         $sensorData = [
             'activo' => true,
             'tipo' => $request->tipo,
@@ -174,7 +178,6 @@ class FirebaseSensorController extends Controller
             'ultima_actualizacion' => now()->toISOString(),
         ];
 
-        // Agregar campos específicos según tipo
         switch ($request->tipo) {
             case 'movimiento_tierra':
                 $sensorData['movimiento'] = 0.0;
@@ -194,28 +197,39 @@ class FirebaseSensorController extends Controller
                 break;
         }
 
-        // Guardar en Firebase
+        // Guardar en base de datos local (siempre)
+        $localSensor = Sensor::firstOrCreate(
+            ['device_id' => $request->sensor_id],
+            [
+                'nombre' => $request->sensor_id,
+                'area_id' => $areaId,
+                'activo' => true,
+                'estado' => 'activo',
+            ]
+        );
+
+        // Intentar guardar en Firebase
         $firebaseSuccess = $this->firebaseService->sendSensorData($request->sensor_id, $sensorData);
 
-        // Guardar en base de datos local
-        $localSensor = Sensor::create([
-            'device_id' => $request->sensor_id,
-            'nombre' => $request->sensor_id,
-            'area_id' => null, // Por ahora, después se puede asignar área específica
-            'activo' => true,
-        ]);
+        $message = 'Sensor creado exitosamente en el sistema local';
+        $type = 'success';
 
-        if ($firebaseSuccess && $localSensor) {
-            return redirect()->route('sensor-dashboard')->with('success', 'Sensor creado exitosamente');
-        } elseif ($firebaseSuccess) {
-            return redirect()->route('sensor-dashboard')->with('warning', 'Sensor creado en Firebase, pero error en base de datos local');
+        if ($firebaseSuccess) {
+            $message = 'Sensor creado exitosamente en Firebase y sistema local';
         } else {
-            // Si Firebase falló, eliminar el registro local
-            if ($localSensor) {
-                $localSensor->delete();
-            }
-            return redirect()->back()->with('error', 'Error al crear sensor');
+            $message .= ' (Firebase no disponible, funciona solo localmente)';
+            $type = 'warning';
         }
+
+        // Registrar en auditoría
+        \App\Helpers\AuditLogger::log(
+            'CREAR_SENSOR',
+            'sensors',
+            $localSensor->id,
+            "Sensor {$request->sensor_id} de tipo {$request->tipo} creado en área {$request->area}"
+        );
+
+        return redirect()->route('sensor-dashboard')->with($type, $message);
     }
 
     /**

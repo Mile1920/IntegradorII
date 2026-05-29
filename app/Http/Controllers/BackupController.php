@@ -10,6 +10,11 @@ use Symfony\Component\Process\Process;
 
 class BackupController extends Controller
 {
+    public function index()
+    {
+        return view('backups.index');
+    }
+
     public function create($type = 'full')
     {
         try {

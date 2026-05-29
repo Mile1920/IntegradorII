@@ -271,6 +271,20 @@ Route::middleware(['auth','role:tecnico|administrador-area|administrador-princip
 // ========================================
 // RUTAS DE SISTEMA (backup, cache, etc.)
 // ========================================
+Route::middleware(['auth', 'role:administrador-principal'])->group(function () {
+    // Backups
+    Route::get('/backups', [App\Http\Controllers\BackupController::class, 'index'])->name('backups.index');
+    Route::post('/api/backups/create', [App\Http\Controllers\BackupController::class, 'create'])->name('backup.create');
+    Route::get('/api/backups/list', [App\Http\Controllers\BackupController::class, 'list'])->name('backup.list');
+    Route::get('/api/backups/download/{filename}', [App\Http\Controllers\BackupController::class, 'download'])->name('backup.download');
+    Route::delete('/api/backups/{filename}', [App\Http\Controllers\BackupController::class, 'delete'])->name('backup.delete');
+
+    // Auditoría
+    Route::get('/auditoria', [App\Http\Controllers\AuditController::class, 'index'])->name('auditoria.index');
+    Route::get('/auditoria/{id}', [App\Http\Controllers\AuditController::class, 'show'])->name('auditoria.show');
+    Route::get('/auditoria/limpiar/antiguos', [App\Http\Controllers\AuditController::class, 'limpiar'])->name('auditoria.limpiar');
+});
+
 Route::middleware(['auth', 'role:administrador-principal'])->prefix('admin/system')->group(function () {
     Route::post('/backup/{type?}', [App\Http\Controllers\BackupController::class, 'create'])->name('system.backup.create');
     Route::get('/backup/list', [App\Http\Controllers\BackupController::class, 'list'])->name('system.backup.list');

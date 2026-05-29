@@ -116,7 +116,7 @@ class SystemController extends Controller
             'trabajadores' => Trabajador::count(),
             'trabajadores_activos' => Trabajador::where('activo', true)->count(),
             'ingresos_hoy' => Ingreso::whereDate('created_at', today())->count(),
-            'incidentes_abiertos' => Incidente::where('estado', 'abierto')->count(),
+            'incidentes_abiertos' => Incidente::whereIn('estado', ['pendiente', 'en_proceso'])->count(),
             'sensores_locales' => Sensor::where('activo', true)->count(),
             'datos_sensores_hoy' => SensorData::whereDate('created_at', today())->count(),
         ];

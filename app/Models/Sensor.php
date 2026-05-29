@@ -9,7 +9,7 @@ class Sensor extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['device_id','nombre','area_id','separacion_m','activo'];
+    protected $fillable = ['device_id','nombre','area_id','separacion_m','activo','estado'];
 
     public function area()
     {

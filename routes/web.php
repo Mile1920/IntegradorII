@@ -28,17 +28,39 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $user = auth()->user();
         $esAdminArea = $user->hasRole('administrador-area');
         $areaId = $esAdminArea && $user->trabajador ? $user->trabajador->area_id : null;
+        $limite = now()->subHours(8);
 
         if ($areaId) {
             $trabajadoresActivos = \App\Models\Trabajador::where('activo', true)->where('area_id', $areaId)->count();
-            $incidentesAbiertos = \App\Models\Incidente::where('estado', 'abierto')->where('area_id', $areaId)->count();
+            $incidentesAbiertos = \App\Models\Incidente::whereIn('estado', ['pendiente','en_proceso'])->where('area_id', $areaId)->count();
             $sensorRecientes = \App\Models\SensorData::where('created_at', '>=', now()->subDay())->count();
+            $pendientesSalida = \App\Models\Ingreso::where('tipo', 'ingreso')
+                ->where('registrado_en', '<=', $limite)
+                ->whereNotExists(function ($q) {
+                    $q->select(\Illuminate\Support\Facades\DB::raw(1))
+                        ->from('ingresos', 'salidas')
+                        ->whereColumn('salidas.trabajador_id', 'ingresos.trabajador_id')
+                        ->where('salidas.tipo', 'salida')
+                        ->whereRaw('salidas.registrado_en > ingresos.registrado_en');
+                })
+                ->whereHas('trabajador', fn($q) => $q->where('area_id', $areaId))
+                ->count();
             $recentIncidentes = \App\Models\Incidente::with('area')->where('area_id', $areaId)->orderBy('created_at', 'desc')->limit(6)->get();
             $recentTrabajadores = \App\Models\Trabajador::with('area','cargo')->where('area_id', $areaId)->orderBy('created_at', 'desc')->limit(6)->get();
         } else {
             $trabajadoresActivos = \App\Models\Trabajador::where('activo', true)->count();
-            $incidentesAbiertos = \App\Models\Incidente::where('estado', 'abierto')->count();
+            $incidentesAbiertos = \App\Models\Incidente::whereIn('estado', ['pendiente','en_proceso'])->count();
             $sensorRecientes = \App\Models\SensorData::where('created_at', '>=', now()->subDay())->count();
+            $pendientesSalida = \App\Models\Ingreso::where('tipo', 'ingreso')
+                ->where('registrado_en', '<=', $limite)
+                ->whereNotExists(function ($q) {
+                    $q->select(\Illuminate\Support\Facades\DB::raw(1))
+                        ->from('ingresos', 'salidas')
+                        ->whereColumn('salidas.trabajador_id', 'ingresos.trabajador_id')
+                        ->where('salidas.tipo', 'salida')
+                        ->whereRaw('salidas.registrado_en > ingresos.registrado_en');
+                })
+                ->count();
             $recentIncidentes = \App\Models\Incidente::with('area')->orderBy('created_at', 'desc')->limit(6)->get();
             $recentTrabajadores = \App\Models\Trabajador::with('area','cargo')->orderBy('created_at', 'desc')->limit(6)->get();
         }
@@ -57,6 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'trabajadoresActivos',
             'incidentesAbiertos',
             'sensorRecientes',
+            'pendientesSalida',
             'recentIncidentes',
             'recentTrabajadores',
             'labels',
@@ -102,6 +125,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Estadísticas avanzadas (solo administradores)
     Route::middleware('role:administrador-principal|administrador-area')->group(function () {
         Route::get('/estadisticas', [App\Http\Controllers\EstadisticasController::class, 'index'])->name('estadisticas.index');
+        Route::get('/estadisticas/pdf', [App\Http\Controllers\EstadisticasController::class, 'pdf'])->name('estadisticas.pdf');
     });
 
     // Reportes generales (placeholder)
@@ -194,14 +218,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // -------------------------------
     Route::middleware('role:administrador-principal')->group(function () {
         Route::get('/system/status', [SystemController::class, 'status'])->name('system.status');
-        Route::get('/system/logs', [App\Http\Controllers\LogController::class, 'index'])->name('system.logs');
-        Route::post('/system/logs/clear', [App\Http\Controllers\LogController::class, 'clear'])->name('system.logs.clear');
-        Route::get('/system/logs/download', [App\Http\Controllers\LogController::class, 'download'])->name('system.logs.download');
     });
 });
 
 // Endpoint público para recibir datos desde sensores (si se configuran con SECRET)
 Route::post('/sensors/data', [SensorController::class, 'receive'])->name('sensors.data');
+
+// Endpoint ESP32 (público, para que el ESP32 envie lecturas)
+Route::post('/api/sensor/esp32', [App\Http\Controllers\Esp32SensorController::class, 'recibir'])->name('api.sensor.esp32');
+Route::get('/api/sensor/esp32/health', [App\Http\Controllers\Esp32SensorController::class, 'health'])->name('api.sensor.esp32.health');
+Route::post('/api/sensor/esp32/connect', [App\Http\Controllers\Esp32SensorController::class, 'connect'])->name('api.sensor.esp32.connect');
+Route::post('/api/sensor/esp32/disconnect', [App\Http\Controllers\Esp32SensorController::class, 'disconnect'])->name('api.sensor.esp32.disconnect');
+Route::get('/api/sensor/esp32/status', [App\Http\Controllers\Esp32SensorController::class, 'status'])->name('api.sensor.esp32.status');
+
+// ESP32 management page (authenticated, role: tecnico or admin)
+Route::middleware(['auth', 'role:tecnico|administrador-area|administrador-principal'])->group(function () {
+    Route::get('/sensors/esp32', [App\Http\Controllers\Esp32SensorController::class, 'index'])->name('sensors.esp32');
+    Route::post('/api/sensor/esp32/config', [App\Http\Controllers\Esp32SensorController::class, 'updateConfig'])->name('api.sensor.esp32.config');
+    Route::get('/api/sensor/esp32/config', [App\Http\Controllers\Esp32SensorController::class, 'getConfig'])->name('api.sensor.esp32.config.get');
+});
 
 // Endpoint para actualizar datos desde Firebase (para sincronización)
 Route::post('/api/firebase/sensors/update', function (\Illuminate\Http\Request $request) {

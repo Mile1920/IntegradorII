@@ -22,7 +22,7 @@
         <div class="table-responsive">
             <table class="table table-hover">
                 <thead>
-                    <tr><th>ID</th><th>Device ID</th><th>Nombre</th><th>Área/Nivel</th><th>Separación</th><th>Activo</th><th>Creado</th><th>Acciones</th></tr>
+                    <tr>                        <th>ID</th><th>Device ID</th><th>Nombre</th><th>Área/Nivel</th><th>Separación</th><th>Estado</th><th>Creado</th><th>Acciones</th></tr>
                 </thead>
                 <tbody>
                     @foreach($sensores as $s)
@@ -37,7 +37,15 @@
                             @endif
                         </td>
                         <td>{{ $s->separacion_m ? $s->separacion_m . ' m' : '-' }}</td>
-                        <td>{{ $s->activo ? 'Sí' : 'No' }}</td>
+                        <td>
+                            @if($s->estado === 'activo')
+                                <span class="badge badge-success">Activo</span>
+                            @elseif($s->estado === 'alerta')
+                                <span class="badge badge-warning">Alerta</span>
+                            @else
+                                <span class="badge badge-danger">Inactivo</span>
+                            @endif
+                        </td>
                         <td>{{ $s->created_at->diffForHumans() }}</td>
                         <td>
                             <a href="{{ route('sensors.devices.edit', $s) }}" class="btn btn-sm btn-warning" title="Editar">Editar</a>

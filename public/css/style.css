@@ -1273,3 +1273,128 @@ a.nav-link.text-danger:hover {
 .light-edition .sidebar-wrapper {
     background: transparent;
 }
+
+/* ============================================
+   MEJORAS DE CONTRASTE — VISIBILIDAD GENERAL
+   ============================================ */
+
+/* Sidebar: nav links más legibles */
+.dark-edition .sidebar .nav li.active > a,
+.dark-edition .sidebar .nav li.active > a p,
+.light-edition .sidebar .nav li.active > a,
+.light-edition .sidebar .nav li.active > a p {
+    font-weight: 700 !important;
+    opacity: 1 !important;
+}
+
+.dark-edition .sidebar .nav li > a p,
+.dark-edition .sidebar .nav li > a .icon-img {
+    opacity: 0.9;
+}
+.dark-edition .sidebar .nav li > a:hover p,
+.dark-edition .sidebar .nav li > a:hover .icon-img {
+    opacity: 1;
+}
+
+/* Badges con texto legible */
+.dark-edition .badge {
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 0.35em 0.65em;
+}
+.dark-edition .badge-info {
+    background-color: #17a2b8;
+    color: #fff;
+}
+.dark-edition .badge-secondary {
+    background-color: #6c757d;
+    color: #fff;
+}
+.dark-edition .badge-success {
+    background-color: #28a745;
+    color: #fff;
+}
+.dark-edition .badge-danger {
+    background-color: var(--color-danger-override);
+    color: #fff;
+}
+.dark-edition .badge-warning {
+    background-color: var(--color-warning-override);
+    color: #1e2936;
+}
+
+/* Código y prefabricados en dark mode */
+.dark-edition code,
+.dark-edition pre,
+.dark-edition .sensor-payload {
+    color: #f8f9fa !important;
+    background-color: #0f172a !important;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 0.5rem;
+}
+
+/* Placeholders más visibles */
+.dark-edition input::placeholder,
+.dark-edition textarea::placeholder,
+.dark-edition select::placeholder {
+    color: #adb5bd !important;
+    opacity: 1 !important;
+}
+
+/* Texto pequeño que se pierde */
+.dark-edition small,
+.dark-edition .small,
+.dark-edition .card-category,
+.dark-edition .card .card-category {
+    color: #c5d0dc !important;
+    font-size: 0.85rem !important;
+}
+.dark-edition .card-header-primary .card-category {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Navbar brand y texto */
+.dark-edition .navbar .navbar-brand {
+    color: #f8f9fa !important;
+    font-weight: 600;
+}
+.dark-edition .navbar .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Labels y textos de ayuda */
+.dark-edition .form-label,
+.dark-edition .col-form-label {
+    color: #e0e6f0 !important;
+    font-weight: 500;
+}
+.dark-edition .help-text,
+.dark-edition .form-text {
+    color: #b0bec5 !important;
+}
+
+/* Enlaces en contenido oscuro */
+.dark-edition a:not(.btn):not(.nav-link):not(.page-link) {
+    color: #66d9a0;
+}
+.dark-edition a:not(.btn):not(.nav-link):not(.page-link):hover {
+    color: #8ce6b0;
+}
+
+/* Tablas con mejor contraste de borde */
+.dark-edition .table td,
+.dark-edition .table th {
+    border-color: #334155;
+}
+
+/* Cards de estadísticas (mini cards) siempre texto blanco */
+.mini-card .stat-value,
+.mini-card .stat-label,
+.mini-card .icon-circle {
+    color: #fff !important;
+}
+.mini-card .icon-circle i {
+    color: #fff !important;
+}
+

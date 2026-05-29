@@ -9,7 +9,7 @@ class Incidente extends Model
 {
     protected $table = 'incidentes';
 
-    protected $fillable = ['trabajador_id','area_id','descripcion','gravedad','estado','cerrado_por','cerrado_en'];
+    protected $fillable = ['trabajador_id','area_id','descripcion','gravedad','estado','cerrado_por','cerrado_en','comentario','fecha_reporte'];
 
     protected $casts = [
         'cerrado_en' => 'datetime',

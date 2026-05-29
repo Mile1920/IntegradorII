@@ -51,6 +51,7 @@
                                                 <option value="movimiento_tierra">Movimiento Tierra</option>
                                                 <option value="gases_toxicos">Gases Tóxicos</option>
                                                 <option value="signos_vitales">Signos Vitales</option>
+                                                <option value="salida_pendiente">Salida Pendiente</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
@@ -96,6 +97,9 @@
                                                 @break
                                             @case('signos_vitales')
                                                 <i class="fas fa-heartbeat fa-2x text-warning"></i>
+                                                @break
+                                            @case('salida_pendiente')
+                                                <i class="fas fa-clock fa-2x text-warning"></i>
                                                 @break
                                             @default
                                                 <i class="fas fa-exclamation-circle fa-2x text-warning"></i>

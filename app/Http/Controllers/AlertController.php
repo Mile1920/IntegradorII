@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ingreso;
+use App\Models\Trabajador;
 use Illuminate\Http\Request;
 use App\Services\FirebaseService;
+use Illuminate\Support\Facades\DB;
 
 class AlertController extends Controller
 {
@@ -16,69 +19,100 @@ class AlertController extends Controller
 
     public function index()
     {
-        $sensorData = $this->firebaseService->getSensorData();
         $alerts = [];
 
+        // 1. Alertas de Firebase (sensores IoT)
+        $sensorData = $this->firebaseService->getSensorData();
         if ($sensorData) {
             foreach ($sensorData as $sensorId => $sensor) {
                 if (isset($sensor['alertas']) && is_array($sensor['alertas'])) {
                     foreach ($sensor['alertas'] as $alert) {
-                        $alerts[] = [
-                            'sensor' => $sensorId,
-                            'tipo' => $sensor['tipo'] ?? 'desconocido',
-                            'area' => $sensor['area'] ?? 'Sin área',
-                            'mensaje' => $alert['mensaje'] ?? 'Alerta detectada',
-                            'nivel' => $alert['nivel'] ?? 'medio',
-                            'timestamp' => $alert['timestamp'] ?? now()->toISOString()
-                        ];
+                        $alerts[] = $this->makeAlert(
+                            $sensorId, $sensor['tipo'] ?? 'desconocido',
+                            $sensor['area'] ?? 'Sin área',
+                            $alert['mensaje'] ?? 'Alerta detectada',
+                            $alert['nivel'] ?? 'medio',
+                            $alert['timestamp'] ?? now()->toISOString()
+                        );
                     }
                 }
-
-                if (isset($sensor['tipo'])) {
-                    switch ($sensor['tipo']) {
-                        case 'gases_toxicos':
-                            if (($sensor['co'] ?? 0) > 50) {
-                                $alerts[] = [
-                                    'sensor' => $sensorId,
-                                    'tipo' => 'gases_toxicos',
-                                    'area' => $sensor['area'] ?? 'Sin área',
-                                    'mensaje' => 'Nivel de CO crítico: ' . ($sensor['co'] ?? 0) . ' ppm',
-                                    'nivel' => 'critico',
-                                    'timestamp' => now()->toISOString()
-                                ];
-                            }
-                            break;
-                        case 'movimiento_tierra':
-                            if (($sensor['movimiento'] ?? 0) > 5) {
-                                $alerts[] = [
-                                    'sensor' => $sensorId,
-                                    'tipo' => 'movimiento_tierra',
-                                    'area' => $sensor['area'] ?? 'Sin área',
-                                    'mensaje' => 'Movimiento de tierra excesivo: ' . ($sensor['movimiento'] ?? 0) . ' mm',
-                                    'nivel' => 'critico',
-                                    'timestamp' => now()->toISOString()
-                                ];
-                            }
-                            break;
-                        case 'signos_vitales':
-                            if (($sensor['frecuencia_cardiaca'] ?? 0) > 120 || ($sensor['frecuencia_cardiaca'] ?? 0) < 50) {
-                                $alerts[] = [
-                                    'sensor' => $sensorId,
-                                    'tipo' => 'signos_vitales',
-                                    'area' => $sensor['area'] ?? 'Sin área',
-                                    'mensaje' => 'Frecuencia cardíaca anormal: ' . ($sensor['frecuencia_cardiaca'] ?? 0) . ' bpm',
-                                    'nivel' => 'critico',
-                                    'timestamp' => now()->toISOString()
-                                ];
-                            }
-                            break;
-                    }
-                }
+                $alerts = array_merge($alerts, $this->checkSensorThresholds($sensorId, $sensor));
             }
         }
 
-        $alerts = array_slice(array_reverse($alerts), 0, 50);
+        // 2. Alertas de trabajadores con ingreso sin salida (>8 horas)
+        $limite = now()->subHours(8);
+        $ingresosSinSalida = Ingreso::where('tipo', 'ingreso')
+            ->where('registrado_en', '<=', $limite)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('ingresos', 'salidas')
+                    ->whereColumn('salidas.trabajador_id', 'ingresos.trabajador_id')
+                    ->where('salidas.tipo', 'salida')
+                    ->whereRaw('salidas.registrado_en > ingresos.registrado_en');
+            })
+            ->with('trabajador')
+            ->get();
+
+        foreach ($ingresosSinSalida as $ingreso) {
+            $trabajador = $ingreso->trabajador;
+            if (!$trabajador) continue;
+
+            $horas = now()->diffInHours($ingreso->registrado_en);
+            $areaNombre = $trabajador->area?->nombre ?? 'Sin área';
+            $horaIngreso = $ingreso->registrado_en ? $ingreso->registrado_en->format('H:i') : '--:--';
+            $timestamp = $ingreso->registrado_en ? $ingreso->registrado_en->toISOString() : now()->toISOString();
+            $alerts[] = $this->makeAlert(
+                'TRABAJADOR-' . $trabajador->id,
+                'salida_pendiente',
+                $areaNombre,
+                "{$trabajador->nombre_completo} lleva {$horas}h sin registrar salida (ingreso: {$horaIngreso})",
+                $horas >= 12 ? 'critico' : 'alto',
+                $timestamp
+            );
+        }
+
+        // 3. Ordenar: más recientes primero
+        usort($alerts, function ($a, $b) {
+            return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+        });
+
+        $alerts = array_slice($alerts, 0, 100);
 
         return view('alerts.index', compact('alerts'));
+    }
+
+    private function makeAlert($sensor, $tipo, $area, $mensaje, $nivel, $timestamp)
+    {
+        return compact('sensor', 'tipo', 'area', 'mensaje', 'nivel', 'timestamp');
+    }
+
+    private function checkSensorThresholds($sensorId, $sensor)
+    {
+        $alerts = [];
+        if (!isset($sensor['tipo'])) return $alerts;
+
+        switch ($sensor['tipo']) {
+            case 'gases_toxicos':
+                if (($sensor['co'] ?? 0) > 50) {
+                    $alerts[] = $this->makeAlert($sensorId, 'gases_toxicos', $sensor['area'] ?? 'Sin área',
+                        'Nivel de CO crítico: ' . ($sensor['co'] ?? 0) . ' ppm', 'critico', now()->toISOString());
+                }
+                break;
+            case 'movimiento_tierra':
+                if (($sensor['movimiento'] ?? 0) > 5) {
+                    $alerts[] = $this->makeAlert($sensorId, 'movimiento_tierra', $sensor['area'] ?? 'Sin área',
+                        'Movimiento de tierra excesivo: ' . ($sensor['movimiento'] ?? 0) . ' mm', 'critico', now()->toISOString());
+                }
+                break;
+            case 'signos_vitales':
+                $hr = $sensor['frecuencia_cardiaca'] ?? 0;
+                if ($hr > 120 || ($hr < 50 && $hr > 0)) {
+                    $alerts[] = $this->makeAlert($sensorId, 'signos_vitales', $sensor['area'] ?? 'Sin área',
+                        'Frecuencia cardíaca anormal: ' . $hr . ' bpm', 'critico', now()->toISOString());
+                }
+                break;
+        }
+        return $alerts;
     }
 }

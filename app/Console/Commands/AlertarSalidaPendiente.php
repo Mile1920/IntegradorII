@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Ingreso;
 use App\Models\Trabajador;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -19,11 +20,12 @@ class AlertarSalidaPendiente extends Command
 
         $ingresosSinSalida = Ingreso::where('tipo', 'ingreso')
             ->where('registrado_en', '<=', $limite)
-            ->whereNotIn('trabajador_id', function ($q) {
-                $q->select('trabajador_id')->from('ingresos')
-                    ->where('tipo', 'salida')
-                    ->whereColumn('trabajador_id', 'ingresos.trabajador_id')
-                    ->whereRaw('registrado_en > ingresos.registrado_en');
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('ingresos', 'salidas')
+                    ->whereColumn('salidas.trabajador_id', 'ingresos.trabajador_id')
+                    ->where('salidas.tipo', 'salida')
+                    ->whereRaw('salidas.registrado_en > ingresos.registrado_en');
             })
             ->with('trabajador')
             ->get();

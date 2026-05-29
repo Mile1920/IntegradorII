@@ -59,7 +59,7 @@ class SensorController extends Controller
                     'area_id' => $request->input('area_id'),
                     'descripcion' => 'Alerta generada por sensor: ' . json_encode($data),
                     'gravedad' => 'critica',
-                    'estado' => 'abierto',
+                    'estado' => 'pendiente',
                 ]);
 
                 Log::info("Incidente crítico creado automáticamente por sensor {$sensorId}, ID: {$incidente->id}");
@@ -84,6 +84,19 @@ class SensorController extends Controller
     {
         $recent = SensorData::orderBy('created_at', 'desc')->limit(50)->get();
 
-        return view('sensors.index', ['datos' => $recent]);
+        $esp32Mac = config('esp32.mac', env('ESP32_MAC', '00:4B:12:35:3E:00'));
+        $esp32Lecturas = SensorData::where(function ($q) use ($esp32Mac) {
+                $q->where('device_id', 'esp32_001')
+                  ->orWhere('device_id', $esp32Mac)
+                  ->orWhere('device_id', 'ESP32-' . str_replace(':', '', $esp32Mac));
+            })
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+        $esp32Ip = config('esp32.ip', env('ESP32_IP', '192.168.1.205'));
+
+        $datos = $recent;
+
+        return view('sensors.index', compact('datos', 'esp32Lecturas', 'esp32Ip', 'esp32Mac'));
     }
 }

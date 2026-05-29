@@ -7,7 +7,7 @@
     <title>Ingresar | Mina Porco</title>
 
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
         body {
@@ -168,7 +168,12 @@
 
         <div class="input-group">
             <input type="password" name="password" id="password" required placeholder="Contraseña">
-            <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+            <span class="toggle-password" id="togglePassword">
+                <svg id="eyeIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </span>
         </div>
         @error('password') <div class="error">{{ $message }}</div> @enderror
 
@@ -189,18 +194,17 @@
     document.addEventListener('DOMContentLoaded', function() {
         const togglePassword = document.querySelector('#togglePassword');
         const password = document.querySelector('#password');
+        const eyeIcon = document.querySelector('#eyeIcon');
 
-        if (togglePassword && password) {
-            // Inicialmente oculto (password)
+        if (togglePassword && password && eyeIcon) {
             password.setAttribute('type', 'password');
-            togglePassword.classList.remove('fa-eye-slash');
-            togglePassword.classList.add('fa-eye');
 
             togglePassword.addEventListener('click', function () {
-                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-                password.setAttribute('type', type);
-                this.classList.toggle('fa-eye');
-                this.classList.toggle('fa-eye-slash');
+                const isPassword = password.getAttribute('type') === 'password';
+                password.setAttribute('type', isPassword ? 'text' : 'password');
+                eyeIcon.innerHTML = isPassword
+                    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>'
+                    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
             });
         }
     });

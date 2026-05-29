@@ -22,9 +22,14 @@
                     <h4 class="card-title mb-0"><i class="material-icons" style="vertical-align: middle;">bar_chart</i> Estadísticas del Sistema</h4>
                     <p class="card-category mb-0">Datos agregados y tendencias — {{ now()->format('d/m/Y H:i') }}</p>
                 </div>
-                <button class="btn btn-outline-light btn-sm" onclick="location.reload()">
-                    <i class="material-icons" style="vertical-align: middle; font-size: 1rem;">refresh</i> Actualizar
-                </button>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('estadisticas.pdf') }}" class="btn btn-outline-light btn-sm">
+                        <i class="material-icons" style="vertical-align: middle; font-size: 1rem;">picture_as_pdf</i> PDF
+                    </a>
+                    <button class="btn btn-outline-light btn-sm" onclick="location.reload()">
+                        <i class="material-icons" style="vertical-align: middle; font-size: 1rem;">refresh</i> Actualizar
+                    </button>
+                </div>
             </div>
         </div>
     </div>

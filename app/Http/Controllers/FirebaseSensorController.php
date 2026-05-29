@@ -120,6 +120,17 @@ class FirebaseSensorController extends Controller
             $avgHumidity /= $count;
         }
 
+        $esp32Mac = config('esp32.mac', env('ESP32_MAC', '00:4B:12:35:3E:00'));
+        $esp32Lecturas = \App\Models\SensorData::where(function ($q) use ($esp32Mac) {
+                $q->where('device_id', 'esp32_001')
+                  ->orWhere('device_id', $esp32Mac)
+                  ->orWhere('device_id', 'ESP32-' . str_replace(':', '', $esp32Mac));
+            })
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+        $esp32Ip = config('esp32.ip', env('ESP32_IP', '192.168.1.205'));
+
         return view('sensor-dashboard', compact(
             'sensorData',
             'activeSensors',
@@ -127,7 +138,10 @@ class FirebaseSensorController extends Controller
             'totalReadings',
             'alerts',
             'avgTemperature',
-            'avgHumidity'
+            'avgHumidity',
+            'esp32Lecturas',
+            'esp32Ip',
+            'esp32Mac'
         ));
     }
 

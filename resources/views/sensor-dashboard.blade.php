@@ -13,7 +13,6 @@
                     <h3 class="card-title mb-0 d-inline">
                         <i class="fas fa-chart-line"></i> Dashboard de Sensores
                     </h3>
-                    <small class="text-muted d-block">Monitoreo y gestión de dispositivos IoT</small>
                 </div>
                 <div>
                     @if(auth()->user()->hasAnyRole(['administrador-principal', 'administrador-area']))
@@ -140,6 +139,70 @@
                             <div class="card-footer text-center">
                                 <div class="stats">
                                     <small class="text-muted">Actual</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuración ESP32 -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header card-header-primary d-flex align-items-center justify-content-between">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-microchip"></i> ESP32 — Configuración y Estado
+                                </h5>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-success btn-sm" onclick="conectarEsp32()">
+                                        <i class="fas fa-plug"></i> Conectar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="desconectarEsp32()">
+                                        <i class="fas fa-power-off"></i> Desconectar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <label class="form-label">Dirección IP</label>
+                                        <input type="text" id="esp32Ip" class="form-control" value="{{ $esp32Ip ?? config('esp32.ip', env('ESP32_IP', '192.168.1.205')) }}" placeholder="192.168.1.205">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label">Dirección MAC</label>
+                                        <input type="text" id="esp32Mac" class="form-control" value="{{ $esp32Mac ?? config('esp32.mac', env('ESP32_MAC', '00:4B:12:35:3E:00')) }}" placeholder="00:4B:12:35:3E:00">
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button class="btn btn-primary w-100" onclick="saveEsp32Config()">
+                                            <i class="fas fa-save"></i> Guardar
+                                        </button>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div id="esp32Status" class="p-3 rounded text-center" style="background: #f5f5f5;">
+                                            <h6>Estado</h6>
+                                            <div id="esp32StatusText" class="text-muted">
+                                                <i class="fas fa-circle-notch fa-spin"></i> Verificando...
+                                            </div>
+                                            <small id="esp32Latency" class="text-muted"></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Últimas Lecturas</h6>
+                                        <div id="esp32Lecturas" style="max-height: 150px; overflow-y: auto;">
+                                            @forelse($esp32Lecturas ?? [] as $lectura)
+                                                <div class="small border-bottom py-1">
+                                                    <span class="text-primary">{{ $lectura->created_at->format('H:i:s') }}</span>
+                                                    —
+                                                    <span>{{ $lectura->tipo }}: {{ json_encode($lectura->payload) }}</span>
+                                                </div>
+                                            @empty
+                                                <div class="text-muted small">Sin lecturas aún</div>
+                                            @endforelse
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -532,6 +595,9 @@ document.addEventListener('DOMContentLoaded', function() {
         showInfo(`Configuración para sensor ${sensorId} próximamente disponible.`);
     };
 
+    // ESP32: verificar estado al cargar
+    verificarEstadoEsp32();
+
     // Auto-refresh cada 30 segundos
     setInterval(() => {
         // Solo refrescar si no hay filtros activos
@@ -540,6 +606,88 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 30000);
 });
+</script>
+
+<script>
+// ESP32 funciones
+function verificarEstadoEsp32() {
+    fetch('{{ route("api.sensor.esp32.status") }}')
+        .then(r => r.json())
+        .then(data => actualizarUIEsp32(data))
+        .catch(() => actualizarUIEsp32({ connected: false }));
+}
+
+function conectarEsp32() {
+    const statusEl = document.getElementById('esp32StatusText');
+    statusEl.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Conectando...';
+
+    fetch('{{ route("api.sensor.esp32.connect") }}', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+    })
+    .then(r => r.json())
+    .then(data => {
+        actualizarUIEsp32(data);
+        if (data.connected) {
+            showAlert('ESP32 conectado', 'success');
+        } else {
+            showAlert('No se pudo conectar al ESP32: ' + (data.error || 'sin respuesta'), 'warning');
+        }
+    })
+    .catch(() => showAlert('Error de red al conectar', 'danger'));
+}
+
+function desconectarEsp32() {
+    fetch('{{ route("api.sensor.esp32.disconnect") }}', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+    })
+    .then(r => r.json())
+    .then(data => {
+        actualizarUIEsp32({ connected: false });
+        showAlert('ESP32 desconectado manualmente', 'info');
+    })
+    .catch(() => showAlert('Error de red', 'danger'));
+}
+
+function actualizarUIEsp32(data) {
+    const statusEl = document.getElementById('esp32StatusText');
+    const latencyEl = document.getElementById('esp32Latency');
+    const statusDiv = document.getElementById('esp32Status');
+
+    if (data.connected) {
+        statusEl.innerHTML = '<span style="color:#4CAF50;font-size:1.2rem"><i class="fas fa-check-circle"></i> Conectado</span>';
+        latencyEl.textContent = data.latency_ms ? 'Latencia: ' + data.latency_ms + 'ms' : '';
+        statusDiv.style.background = '#e8f5e9';
+    } else {
+        statusEl.innerHTML = '<span style="color:#f44336;font-size:1.2rem"><i class="fas fa-times-circle"></i> Desconectado</span>';
+        latencyEl.textContent = data.error || 'Sin conexión';
+        statusDiv.style.background = '#ffebee';
+    }
+}
+
+function saveEsp32Config() {
+    const ip = document.getElementById('esp32Ip').value.trim();
+    const mac = document.getElementById('esp32Mac').value.trim();
+
+    if (!ip) { showAlert('La IP es requerida', 'warning'); return; }
+    if (!mac) { showAlert('La MAC es requerida', 'warning'); return; }
+
+    fetch('{{ route("api.sensor.esp32.config") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        body: JSON.stringify({ ip, mac })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('Configuración guardada correctamente', 'success');
+        } else {
+            showAlert('Error al guardar: ' + (data.message || 'desconocido'), 'danger');
+        }
+    })
+    .catch(() => showAlert('Error de red al guardar configuración', 'danger'));
+}
 </script>
 @endpush
 @endsection

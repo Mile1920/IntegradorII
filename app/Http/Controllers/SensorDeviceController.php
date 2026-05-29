@@ -45,6 +45,7 @@ class SensorDeviceController extends Controller
                         'area_id' => $row['area_id'] ?? null,
                         'separacion_m' => isset($row['separacion_m']) ? (float)$row['separacion_m'] : null,
                         'activo' => true,
+                        'estado' => 'activo',
                     ]);
                     $created++;
                 });
@@ -75,7 +76,8 @@ class SensorDeviceController extends Controller
             'nombre' => 'nullable|string|max:255',
             'area_id' => 'nullable|exists:areas,id',
             'separacion_m' => 'nullable|numeric|min:0|max:99999.99',
-            'activo' => 'nullable|boolean'
+            'activo' => 'nullable|boolean',
+            'estado' => 'nullable|string|in:activo,inactivo,alerta'
         ]);
 
         try {

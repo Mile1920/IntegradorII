@@ -40,9 +40,7 @@ class IncidenteController extends Controller
             }
             
             if ($request->filled('comentario')) {
-                if (in_array('comentario', $incidente->getFillable())) {
-                    $incidente->comentario = trim($request->comentario);
-                }
+                $incidente->comentario = trim($request->comentario);
             }
             
             $incidente->save();

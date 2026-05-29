@@ -119,12 +119,6 @@
                         <p>Estado Sistema</p>
                     </a>
                 </li>
-                <li class="nav-item {{ request()->routeIs('system.logs') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('system.logs') }}">
-                        <img src="{{ asset('img/Monitoreo.png') }}" alt="Logs" class="icon-img">
-                        <p>Logs del Sistema</p>
-                    </a>
-                </li>
             @endif
 
             <!-- Funcionalidades del Trabajador -->

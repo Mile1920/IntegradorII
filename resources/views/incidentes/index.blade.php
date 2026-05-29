@@ -26,6 +26,7 @@
                         <th>Trabajador</th>
                         <th>Área</th>
                         <th>Creado</th>
+                        <th>Fecha Reporte</th>
                         <th>Cambiar Estado</th>
                     </tr>
                 </thead>
@@ -47,6 +48,7 @@
                             <span class="text-danger">Aún no atendido</span>
                             @endif
                         </td>
+                        <td>{{ $i->fecha_reporte ? $i->fecha_reporte->format('d/m/Y H:i') : ($i->created_at ? $i->created_at->format('d/m/Y H:i') : '-') }}</td>
                         <td>
                             <form action="{{ route('incidentes.updateEstado', $i) }}" method="POST" class="d-inline">
                                 @csrf

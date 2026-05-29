@@ -45,6 +45,15 @@
                 </select>
             </div>
 
+            <div class="mb-3">
+                <label class="form-label">Estado</label>
+                <select name="estado" class="form-control">
+                    <option value="activo" @if($sensor->estado === 'activo') selected @endif>Activo</option>
+                    <option value="inactivo" @if($sensor->estado === 'inactivo') selected @endif>Inactivo</option>
+                    <option value="alerta" @if($sensor->estado === 'alerta') selected @endif>Con Alerta</option>
+                </select>
+            </div>
+
             <button class="btn btn-primary">Guardar cambios</button>
         </form>
     </div>

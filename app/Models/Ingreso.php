@@ -13,7 +13,14 @@ class Ingreso extends Model
 
     public $timestamps = true;
 
-    protected $dates = ['registrado_en','created_at','updated_at'];
+    protected function casts(): array
+    {
+        return [
+            'registrado_en' => 'datetime',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ];
+    }
 
     public function trabajador(): BelongsTo
     {

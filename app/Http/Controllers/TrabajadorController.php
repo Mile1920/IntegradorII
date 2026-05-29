@@ -441,7 +441,8 @@ class TrabajadorController extends Controller
                 'area_id' => $request->input('area_id'),
                 'descripcion' => $request->input('descripcion'),
                 'gravedad' => $request->input('gravedad'),
-                'estado' => 'abierto',
+                'estado' => 'pendiente',
+                'fecha_reporte' => now(),
             ]);
 
             Log::info("Incidente reportado ID {$incidente->id} por trabajador ID {$trabajador->id}");
@@ -457,7 +458,7 @@ class TrabajadorController extends Controller
     public function enviarSos(Trabajador $trabajador)
     {
         $abierto = Incidente::where('trabajador_id', $trabajador->id)
-            ->where('estado', 'abierto')
+            ->whereIn('estado', ['pendiente', 'en_proceso'])
             ->where('descripcion', 'like', 'SOS%')
             ->latest()
             ->first();
@@ -472,7 +473,8 @@ class TrabajadorController extends Controller
                 'area_id' => $trabajador->area_id,
                 'descripcion' => 'SOS manual: accidente reportado por supervisor',
                 'gravedad' => 'critica',
-                'estado' => 'abierto',
+                'estado' => 'pendiente',
+                'fecha_reporte' => now(),
             ]);
 
             Log::warning("SOS manual generado para trabajador {$trabajador->id} incidente {$incidente->id}");
@@ -658,7 +660,8 @@ class TrabajadorController extends Controller
                 'area_id' => $request->input('area_id'),
                 'descripcion' => $request->input('descripcion'),
                 'gravedad' => $request->input('gravedad'),
-                'estado' => 'abierto',
+                'estado' => 'pendiente',
+                'fecha_reporte' => now(),
             ]);
 
             Log::info("[MiReporte] Incidente {$incidente->id} reportado por trabajador {$trabajador->id}");

@@ -6,6 +6,7 @@ use App\Models\SensorData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\Auditoria;
 
 class Esp32SensorController extends Controller
 {
@@ -63,6 +64,27 @@ class Esp32SensorController extends Controller
             ]);
 
             Log::info("[ESP32] Datos recibidos de {$payload['device_id']} (tipo: {$payload['tipo']})");
+
+            // Verificar si hay alerta de gas (MQ-7 > 2200 o MQ-135 > 2850)
+            $mediciones = $payload['mediciones'] ?? $payload;
+            $mq7 = $mediciones['mq7_co'] ?? 0;
+            $mq135 = $mediciones['mq135_aire'] ?? 0;
+            $alertaActiva = $mediciones['alerta'] ?? false;
+
+            if ($alertaActiva || $mq7 > 2200 || $mq135 > 2850) {
+                $nivel = ($mq7 > 2600 || $mq135 > 3200) ? 'critico' : 'alto';
+                Auditoria::create([
+                    'usuario_id' => null,
+                    'accion' => 'alerta_gas',
+                    'descripcion' => "{$nivel}: MQ-7={$mq7}, MQ-135={$mq135} — Niveles peligrosos de gas en Mina Subterránea",
+                    'tabla_afectada' => 'sensor_data',
+                    'registro_id' => null,
+                    'valores_antiguos' => null,
+                    'valores_nuevos' => json_encode($mediciones),
+                    'created_at' => now(),
+                ]);
+                Log::warning("[ESP32] ALERTA DE GAS - MQ-7: {$mq7}, MQ-135: {$mq135}");
+            }
 
             return response()->json([
                 'success' => true,

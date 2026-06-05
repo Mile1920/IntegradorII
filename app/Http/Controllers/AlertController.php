@@ -7,6 +7,7 @@ use App\Models\Trabajador;
 use Illuminate\Http\Request;
 use App\Services\FirebaseService;
 use Illuminate\Support\Facades\DB;
+use App\Models\SensorData;
 
 class AlertController extends Controller
 {
@@ -72,7 +73,34 @@ class AlertController extends Controller
             );
         }
 
-        // 3. Ordenar: más recientes primero
+        // 3. Alertas de gases ESP32 (lecturas con alertas activas en los últimos 10 min)
+        $ultimasLecturas = SensorData::where('device_id', 'esp32_gases_01')
+            ->where('created_at', '>=', now()->subMinutes(10))
+            ->orderBy('created_at', 'desc')
+            ->limit(20)
+            ->get();
+
+        foreach ($ultimasLecturas as $lectura) {
+            $payload = $lectura->payload;
+            if (!is_array($payload)) continue;
+
+            $alertaActiva = $payload['alerta'] ?? false;
+            $mq7 = $payload['mq7_co'] ?? 0;
+            $mq135 = $payload['mq135_aire'] ?? 0;
+
+            if ($alertaActiva || $mq7 > 2200 || $mq135 > 2850) {
+                $alerts[] = $this->makeAlert(
+                    'ESP32-GASES',
+                    'gases_toxicos',
+                    'Mina Subterránea',
+                    ($alertaActiva ? '⚠️ ' : '') . "MQ-7: {$mq7} | MQ-135: {$mq135} — Niveles peligrosos detectados",
+                    $mq7 > 2600 || $mq135 > 3200 ? 'critico' : 'alto',
+                    $lectura->created_at->toISOString()
+                );
+            }
+        }
+
+        // 4. Ordenar: más recientes primero
         usort($alerts, function ($a, $b) {
             return strtotime($b['timestamp']) - strtotime($a['timestamp']);
         });

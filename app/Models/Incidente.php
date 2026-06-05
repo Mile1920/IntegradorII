@@ -12,6 +12,7 @@ class Incidente extends Model
     protected $fillable = ['trabajador_id','area_id','descripcion','gravedad','estado','cerrado_por','cerrado_en','comentario','fecha_reporte'];
 
     protected $casts = [
+        'fecha_reporte' => 'datetime',
         'cerrado_en' => 'datetime',
     ];
 

@@ -10,26 +10,30 @@ use App\Models\Cargo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 
 class EstadisticasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = $this->getData(auth()->user());
+        $data = $this->getData(auth()->user(), $request);
 
         return view('estadisticas.index', $data);
     }
 
-    public function pdf()
+    public function pdf(Request $request)
     {
-        $data = $this->getData(auth()->user());
+        $data = $this->getData(auth()->user(), $request);
 
         $pdf = Pdf::loadView('estadisticas.pdf', $data);
         return $pdf->download('estadisticas-mina-porco-' . now()->format('Y-m-d') . '.pdf');
     }
 
-    private function getData($user)
+    private function getData($user, Request $request = null)
     {
+        $desde = $request && $request->filled('desde') ? \Carbon\Carbon::parse($request->desde) : today()->subDays(30);
+        $hasta = $request && $request->filled('hasta') ? \Carbon\Carbon::parse($request->hasta)->endOfDay() : today()->endOfDay();
+
         $totalTrabajadores = Trabajador::where('activo', true)->count();
         $totalAreas = Area::where('activo', true)->count();
         $totalCargos = Cargo::where('activo', true)->count();
@@ -98,6 +102,39 @@ class EstadisticasController extends Controller
             $incidentesCriticos = Incidente::where('gravedad', 'critica')->where('area_id', $areaRestringida)->count();
         }
 
+        // Tabla de datos del período filtrado
+        $incidentesQuery = Incidente::whereBetween('created_at', [$desde, $hasta]);
+        $ingresosQuery = Ingreso::whereBetween('registrado_en', [$desde, $hasta])->with('trabajador');
+        if ($areaRestringida) {
+            $incidentesQuery->where('area_id', $areaRestringida);
+            $ingresosQuery->whereHas('trabajador', fn($q) => $q->where('area_id', $areaRestringida));
+        }
+        $incidentesPeriodo = $incidentesQuery->get();
+        $ingresosPeriodo = $ingresosQuery->get();
+        $dataTable = collect();
+
+        foreach ($incidentesPeriodo as $inc) {
+            $dataTable->push([
+                'fecha' => $inc->created_at ? $inc->created_at->format('d/m/Y H:i') : '-',
+                'tipo' => 'Incidente',
+                'tipo_badge' => 'danger',
+                'descripcion' => Str::limit($inc->descripcion ?? 'Incidente reportado', 80),
+                'origen' => $inc->trabajador?->nombre_completo ?? 'Sistema',
+                'estado' => ucfirst($inc->estado ?? 'pendiente'),
+            ]);
+        }
+        foreach ($ingresosPeriodo as $ing) {
+            $dataTable->push([
+                'fecha' => $ing->registrado_en ? $ing->registrado_en->format('d/m/Y H:i') : '-',
+                'tipo' => $ing->tipo === 'ingreso' ? 'Ingreso' : 'Salida',
+                'tipo_badge' => $ing->tipo === 'ingreso' ? 'success' : 'warning',
+                'descripcion' => $ing->tipo === 'ingreso' ? 'Registro de ingreso' : 'Registro de salida',
+                'origen' => $ing->trabajador?->nombre_completo ?? '-',
+                'estado' => 'Completado',
+            ]);
+        }
+        $dataTable = $dataTable->sortByDesc('fecha')->values();
+
         return compact(
             'totalTrabajadores', 'totalAreas', 'totalCargos',
             'ingresosHoy', 'salidasHoy', 'ingresosMes', 'salidasMes',
@@ -105,7 +142,7 @@ class EstadisticasController extends Controller
             'turnos', 'trabajadoresPorArea',
             'ingresos7d', 'salidas7d', 'labels7d', 'horasPico',
             'incidentesPorGravedad', 'incidentes6m', 'labels6m',
-            'areaRestringida'
+            'areaRestringida', 'dataTable'
         );
     }
 }

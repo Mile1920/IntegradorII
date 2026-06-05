@@ -78,72 +78,66 @@
                         </div>
                     </div>
 
-                    <!-- Lista de Alertas -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            @foreach($alerts as $alert)
-                            <div class="alert alert-item mb-3 border-left border-{{ $alert['nivel'] === 'critico' ? 'warning' : ($alert['nivel'] === 'alto' ? 'warning' : ($alert['nivel'] === 'medio' ? 'info' : 'secondary')) }} border-left-4"
-                                 data-nivel="{{ $alert['nivel'] }}"
-                                 data-tipo="{{ $alert['tipo'] }}"
-                                 data-area="{{ $alert['area'] }}">
-                                <div class="d-flex align-items-start">
-                                    <div class="me-3 mt-1">
+                    <!-- Tabla de Alertas -->
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped" id="alertsTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Sensor / Origen</th>
+                                    <th>Área</th>
+                                    <th>Tipo</th>
+                                    <th>Mensaje</th>
+                                    <th>Nivel</th>
+                                    <th>Fecha/Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($alerts as $alert)
+                                <tr class="alert-item"
+                                    data-nivel="{{ $alert['nivel'] }}"
+                                    data-tipo="{{ $alert['tipo'] }}"
+                                    data-area="{{ $alert['area'] }}">
+                                    <td><strong>{{ $alert['sensor'] }}</strong></td>
+                                    <td>{{ $alert['area'] }}</td>
+                                    <td>
                                         @switch($alert['tipo'])
                                             @case('movimiento_tierra')
-                                                <i class="fas fa-mountain fa-2x text-warning"></i>
+                                                <span class="badge badge-warning"><i class="fas fa-mountain"></i> Mov. Tierra</span>
                                                 @break
                                             @case('gases_toxicos')
-                                                <i class="fas fa-skull-crossbones fa-2x text-warning"></i>
+                                                <span class="badge badge-danger"><i class="fas fa-skull-crossbones"></i> Gases Tóxicos</span>
                                                 @break
                                             @case('signos_vitales')
-                                                <i class="fas fa-heartbeat fa-2x text-warning"></i>
+                                                <span class="badge badge-info"><i class="fas fa-heartbeat"></i> Signos Vitales</span>
                                                 @break
                                             @case('salida_pendiente')
-                                                <i class="fas fa-clock fa-2x text-warning"></i>
+                                                <span class="badge badge-secondary"><i class="fas fa-clock"></i> Salida Pendiente</span>
                                                 @break
                                             @default
-                                                <i class="fas fa-exclamation-circle fa-2x text-warning"></i>
+                                                <span class="badge badge-secondary">{{ $alert['tipo'] }}</span>
                                         @endswitch
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <h6 class="mb-1">
-                                                    <strong>{{ $alert['sensor'] }}</strong> -
-                                                    <span class="text-primary">{{ $alert['area'] }}</span>
-                                                </h6>
-                                                <p class="mb-1 text-muted">{{ $alert['mensaje'] }}</p>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-clock"></i>
-                                                    {{ \Carbon\Carbon::parse($alert['timestamp'])->format('d/m/Y H:i:s') }}
-                                                </small>
-                                            </div>
-                                            <div class="text-end">
-                                                <span class="badge badge-{{ $alert['nivel'] === 'critico' ? 'warning' : ($alert['nivel'] === 'alto' ? 'warning' : ($alert['nivel'] === 'medio' ? 'info' : 'secondary')) }} mb-2">
-                                                    @switch($alert['nivel'])
-                                                        @case('critico')
-                                                            <i class="fas fa-exclamation-triangle"></i> CRÍTICA
-                                                            @break
-                                                        @case('alto')
-                                                            <i class="fas fa-exclamation-circle"></i> ALTA
-                                                            @break
-                                                        @case('medio')
-                                                            <i class="fas fa-info-circle"></i> MEDIA
-                                                            @break
-                                                        @case('bajo')
-                                                            <i class="fas fa-check-circle"></i> BAJA
-                                                            @break
-                                                    @endswitch
-                                                </span>
-                                                <br>
-                                                <small class="text-muted">{{ ucfirst($alert['tipo']) }}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
+                                    </td>
+                                    <td>{{ $alert['mensaje'] }}</td>
+                                    <td>
+                                        @switch($alert['nivel'])
+                                            @case('critico')
+                                                <span class="badge badge-danger"><i class="fas fa-exclamation-triangle"></i> CRÍTICA</span>
+                                                @break
+                                            @case('alto')
+                                                <span class="badge badge-warning"><i class="fas fa-exclamation-circle"></i> ALTA</span>
+                                                @break
+                                            @case('medio')
+                                                <span class="badge badge-info"><i class="fas fa-info-circle"></i> MEDIA</span>
+                                                @break
+                                            @default
+                                                <span class="badge badge-secondary"><i class="fas fa-check-circle"></i> BAJA</span>
+                                        @endswitch
+                                    </td>
+                                    <td>{{ \Carbon\Carbon::parse($alert['timestamp'])->format('d/m/Y H:i:s') }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
 
                     <!-- Estadísticas de Alertas -->
@@ -229,20 +223,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const tipoValue = tipoFilter.value;
         const areaValue = areaFilter.value;
 
-        alertItems.forEach(item => {
-            const nivel = item.dataset.nivel;
-            const tipo = item.dataset.tipo;
-            const area = item.dataset.area;
+        alertItems.forEach(row => {
+            const nivel = row.dataset.nivel;
+            const tipo = row.dataset.tipo;
+            const area = row.dataset.area;
 
             const matchesNivel = !nivelValue || nivel === nivelValue;
             const matchesTipo = !tipoValue || tipo === tipoValue;
             const matchesArea = !areaValue || area === areaValue;
 
-            if (matchesNivel && matchesTipo && matchesArea) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
-            }
+            row.style.display = (matchesNivel && matchesTipo && matchesArea) ? '' : 'none';
         });
     }
 
@@ -257,14 +247,6 @@ document.addEventListener('DOMContentLoaded', function() {
     tipoFilter.addEventListener('change', filterAlerts);
     areaFilter.addEventListener('change', filterAlerts);
     clearFiltersBtn.addEventListener('click', clearFilters);
-
-    // Auto-refresh cada 30 segundos
-    setInterval(() => {
-        if (!nivelFilter.value && !tipoFilter.value && !areaFilter.value) {
-            // Solo refrescar si no hay filtros activos
-            // location.reload();
-        }
-    }, 30000);
 });
 </script>
 @endpush

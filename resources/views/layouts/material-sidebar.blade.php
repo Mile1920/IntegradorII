@@ -125,6 +125,7 @@
                         <img src="{{ asset('img/Logo.png') }}" alt="" class="icon-img">
                     </a>
                 </li>
+            @if(auth()->user()->hasAnyRole(['administrador-principal', 'administrador-area', 'tecnico']))
                 <li class="nav-item {{ request()->routeIs('auditoria.*') ? 'active' : '' }}">
                     <a class="nav-link sidebar-link" href="{{ route('auditoria.index') }}">
                         <span>Auditoría y Seg.</span>
@@ -132,8 +133,6 @@
                     </a>
                 </li>
             @endif
-
-            <!-- Funcionalidades del Trabajador -->
             @if(auth()->user()->hasRole('trabajador'))
                 <li class="nav-item {{ request()->routeIs('mi.ingreso.form') ? 'active' : '' }}">
                     <a class="nav-link sidebar-link" href="{{ route('mi.ingreso.form') }}">

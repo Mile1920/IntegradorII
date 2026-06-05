@@ -50,6 +50,74 @@
     <a href="{{ route('business.flow') }}" class="btn btn-secondary">Volver a Módulos</a>
 </div>
 
+<!-- Tabla de lecturas ESP32 -->
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header card-header-info d-flex align-items-center justify-content-between">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-table"></i> Últimas lecturas de sensores
+            </h5>
+            <small class="text-white-50">{{ count($esp32Lecturas ?? []) }} registros</small>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" style="max-height:300px; overflow-y:auto;">
+                <table class="table table-sm table-hover table-striped">
+                    <thead class="table-info" style="position:sticky; top:0;">
+                        <tr>
+                            <th>Hora</th>
+                            <th>MQ-7 (CO)</th>
+                            <th>MQ-135 (Aire)</th>
+                            <th>Temperatura</th>
+                            <th>Humedad</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($esp32Lecturas ?? [] as $lectura)
+                        <tr class="{{ ($lectura->payload['alerta'] ?? false) ? 'table-danger' : '' }}">
+                            <td class="text-primary">{{ $lectura->created_at->format('H:i:s') }}</td>
+                            <td>
+                                @if(is_array($lectura->payload))
+                                    <span class="badge {{ ($lectura->payload['mq7_co'] ?? 0) > 2200 ? 'badge-danger' : 'badge-secondary' }}">
+                                        {{ $lectura->payload['mq7_co'] ?? '?' }}
+                                    </span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if(is_array($lectura->payload))
+                                    <span class="badge {{ ($lectura->payload['mq135_aire'] ?? 0) > 2850 ? 'badge-danger' : 'badge-secondary' }}">
+                                        {{ $lectura->payload['mq135_aire'] ?? '?' }}
+                                    </span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>{{ is_array($lectura->payload) ? ($lectura->payload['temperatura'] ?? '-') : '-' }}</td>
+                            <td>{{ is_array($lectura->payload) ? ($lectura->payload['humedad'] ?? '-') : '-' }}</td>
+                            <td>
+                                @if($lectura->payload['alerta'] ?? false)
+                                    <span class="badge badge-danger">⚠ ALERTA</span>
+                                @else
+                                    <span class="badge badge-success">Normal</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-3">
+                                <i class="fas fa-info-circle"></i> No hay lecturas aún. Conectá el ESP32 para ver datos.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ESP32 Config -->
 <div class="container mt-4">
     <div class="card">

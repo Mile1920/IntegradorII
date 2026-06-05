@@ -35,6 +35,41 @@
     </div>
 </div>
 
+<!-- Filtro por fechas -->
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Desde</label>
+                        <input type="date" name="desde" class="form-control" value="{{ request('desde', today()->subDays(30)->format('Y-m-d')) }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Hasta</label>
+                        <input type="date" name="hasta" class="form-control" value="{{ request('hasta', today()->format('Y-m-d')) }}">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary form-control">
+                            <i class="material-icons" style="vertical-align: middle; font-size: 1rem;">filter_list</i> Filtrar
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="{{ route('estadisticas.index') }}" class="btn btn-secondary form-control">
+                            <i class="material-icons" style="vertical-align: middle; font-size: 1rem;">clear</i> Limpiar
+                        </a>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <small class="text-muted">
+                            Período: {{ request('desde', today()->subDays(30)->format('d/m/Y')) }} — {{ request('hasta', today()->format('d/m/Y')) }}
+                        </small>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mb-4">
     <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
         <div class="mini-card" style="background: linear-gradient(135deg, #50c878, #2e8b57); color: #fff;">
@@ -89,6 +124,49 @@
         </div>
     </div>
 </div>
+
+<!-- Tabla de datos del período -->
+@if(isset($dataTable) && count($dataTable) > 0)
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="material-icons" style="vertical-align: middle;">table_chart</i> Todos los registros del período</h5>
+                <div class="d-flex gap-2">
+                    <input type="text" id="searchTable" class="form-control form-control-sm" placeholder="Buscar en tabla..." style="width:250px;">
+                    <small class="text-muted align-self-center">{{ count($dataTable) }} registros</small>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" style="max-height:400px; overflow-y:auto;">
+                    <table class="table table-sm table-hover table-striped" id="dataTable">
+                        <thead class="table-dark" style="position:sticky; top:0;">
+                            <tr>
+                                <th>Fecha/Hora</th>
+                                <th>Tipo</th>
+                                <th>Descripción</th>
+                                <th>Usuario / Origen</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($dataTable as $row)
+                            <tr>
+                                <td>{{ $row['fecha'] ?? '-' }}</td>
+                                <td><span class="badge badge-{{ $row['tipo_badge'] ?? 'secondary' }}">{{ $row['tipo'] ?? '-' }}</span></td>
+                                <td>{{ $row['descripcion'] ?? '-' }}</td>
+                                <td>{{ $row['origen'] ?? '-' }}</td>
+                                <td>{{ $row['estado'] ?? '-' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 <?php
 // Pre-process data for charts
@@ -276,6 +354,17 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch(e) { document.getElementById('fallbackIncMes').style.display = 'block'; }
     });
 });
+
+// Tabla de datos: búsqueda en tabla
+var searchInput = document.getElementById('searchTable');
+if (searchInput) {
+    searchInput.addEventListener('keyup', function() {
+        var q = this.value.toLowerCase();
+        document.querySelectorAll('#dataTable tbody tr').forEach(function(row) {
+            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    });
+}
 </script>
 @endpush
 @endsection

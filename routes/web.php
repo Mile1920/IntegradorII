@@ -90,8 +90,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Centro de Alertas
     Route::get('/alerts', [App\Http\Controllers\AlertController::class, 'index'])->name('alerts.index');
 
-    // Vista del flujo de negocio (documentación interna) - Solo administradores
-    Route::middleware('role:administrador-principal|administrador-area')->group(function () {
+    // Vista del flujo de negocio y mapa 2D - Todos los roles
+    Route::middleware('role:administrador-principal|administrador-area|tecnico|trabajador')->group(function () {
         Route::get('/business-flow', function () {
             return view('business_flow');
         })->name('business.flow');
@@ -271,8 +271,8 @@ Route::middleware(['auth','role:tecnico|administrador-area|administrador-princip
 // ========================================
 // RUTAS DE SISTEMA (backup, cache, etc.)
 // ========================================
-Route::middleware(['auth', 'role:administrador-principal'])->group(function () {
-    // Backups
+Route::middleware(['auth', 'role:administrador-principal|administrador-area|tecnico'])->group(function () {
+    // Backups (solo admin-principal puede modificar)
     Route::get('/backups', [App\Http\Controllers\BackupController::class, 'index'])->name('backups.index');
     Route::post('/api/backups/create', [App\Http\Controllers\BackupController::class, 'create'])->name('backup.create');
     Route::get('/api/backups/list', [App\Http\Controllers\BackupController::class, 'list'])->name('backup.list');

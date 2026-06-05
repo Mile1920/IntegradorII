@@ -91,6 +91,19 @@ class Esp32SensorController extends Controller
         ]);
     }
 
+    public function disconnect()
+    {
+        cache(['esp32_disconnected_at' => now()], 86400 * 7); // 7 days
+        cache(['esp32_connected' => false], 86400 * 7);
+
+        Log::info("[ESP32] Desconexión manual solicitada");
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ESP32 marcado como desconectado manualmente'
+        ]);
+    }
+
     public function connect()
     {
         $ip = config('esp32.ip', env('ESP32_IP', '192.168.1.205'));

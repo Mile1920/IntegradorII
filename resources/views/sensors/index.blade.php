@@ -95,17 +95,28 @@
                 </div>
                 <div class="col-md-6">
                     <h6>Últimas Lecturas</h6>
-                    <div id="esp32Lecturas" style="max-height: 150px; overflow-y: auto;">
+                    <div id="esp32Lecturas" style="max-height: 200px; overflow-y: auto;">
                         @forelse($esp32Lecturas ?? [] as $lectura)
                             <div class="small border-bottom py-1">
                                 <span class="text-primary">{{ $lectura->created_at->format('H:i:s') }}</span>
-                                —
-                                <span>{{ $lectura->tipo }}: {{ json_encode($lectura->payload) }}</span>
+                                @if($lectura->tipo === 'gases_toxicos' && is_array($lectura->payload))
+                                    <span class="badge badge-secondary">MQ-7: {{ $lectura->payload['mq7_co'] ?? '?' }}</span>
+                                    <span class="badge badge-secondary">MQ-135: {{ $lectura->payload['mq135_aire'] ?? '?' }}</span>
+                                    @if($lectura->payload['alerta'] ?? false)
+                                        <span class="badge badge-danger">ALERTA</span>
+                                    @endif
+                                @elseif(is_array($lectura->payload))
+                                    @foreach($lectura->payload as $k => $v)
+                                        <span class="badge badge-secondary me-1">{{ $k }}: {{ is_array($v) ? json_encode($v) : $v }}</span>
+                                    @endforeach
+                                @else
+                                    <span>{{ $lectura->tipo }}: {{ json_encode($lectura->payload) }}</span>
+                                @endif
                             </div>
                         @empty
-                                                <div class="text-muted small">Sin lecturas aún</div>
-                                            @endforelse
-                                        </div>
+                            <div class="text-muted small">Sin lecturas aún</div>
+                        @endforelse
+                    </div>
                                     </div>
                                 </div>
                             </div>

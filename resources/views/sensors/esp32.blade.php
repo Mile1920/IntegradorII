@@ -144,7 +144,7 @@ function verificarESP32() {
     dot.style.background = '#ffc107';
     text.textContent = 'Verificando...';
 
-    fetch('{{ route("api.sensor.esp32.check") }}')
+    fetch('{{ route("api.sensor.esp32.status") }}')
         .then(function(r) { return r.json(); })
         .then(function(data) {
             lastCheck.textContent = new Date().toLocaleTimeString();

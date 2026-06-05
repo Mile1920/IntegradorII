@@ -133,7 +133,7 @@
                                                 <span class="badge badge-secondary"><i class="fas fa-check-circle"></i> BAJA</span>
                                         @endswitch
                                     </td>
-                                    <td>{{ \Carbon\Carbon::parse($alert['timestamp'])->format('d/m/Y H:i:s') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($alert['timestamp'])->setTimezone(config('app.timezone'))->format('d/m/Y H:i:s') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

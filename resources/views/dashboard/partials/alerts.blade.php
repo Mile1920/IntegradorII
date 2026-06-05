@@ -105,7 +105,7 @@
                     <div class="flex-grow-1">
                         <strong>{{ $alert['sensor'] }}</strong> - {{ $alert['area'] }}<br>
                         <small>{{ $alert['mensaje'] }}</small><br>
-                        <small class="text-muted">{{ \Carbon\Carbon::parse($alert['timestamp'])->format('d/m/Y H:i:s') }}</small>
+                        <small class="text-muted">{{ \Carbon\Carbon::parse($alert['timestamp'])->setTimezone(config('app.timezone'))->format('d/m/Y H:i:s') }}</small>
                     </div>
                     <div>
                         <span class="badge badge-{{ $alert['nivel'] === 'critico' ? 'danger' : ($alert['nivel'] === 'alto' ? 'warning' : 'info') }}">

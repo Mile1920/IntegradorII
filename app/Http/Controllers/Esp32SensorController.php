@@ -23,11 +23,10 @@ class Esp32SensorController extends Controller
                   ->orWhere('device_id', 'like', 'esp32_%')
                   ->orWhere('device_id', 'like', 'ESP32%');
             })
+            ->where('device_id', '!=', 'esp32_config')
             ->orderBy('created_at', 'desc')
             ->limit(50)
             ->get();
-
-        $ultimaConexion = $lecturas->first()?->created_at;
 
         return view('sensors.esp32', compact('ip', 'mac', 'lecturas', 'ultimaConexion'));
     }
@@ -124,6 +123,7 @@ class Esp32SensorController extends Controller
                   ->orWhere('device_id', 'like', 'esp32_%')
                   ->orWhere('device_id', 'like', 'ESP32%');
             })
+            ->where('device_id', '!=', 'esp32_config')
             ->orderBy('created_at', 'desc')
             ->first();
 
@@ -171,6 +171,7 @@ class Esp32SensorController extends Controller
                   ->orWhere('device_id', 'like', 'esp32_%')
                   ->orWhere('device_id', 'like', 'ESP32%');
             })
+            ->where('device_id', '!=', 'esp32_config')
             ->orderBy('created_at', 'desc')
             ->first();
 

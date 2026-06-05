@@ -1,16 +1,49 @@
-// =============================================
+@extends('layouts.app')
+@section('title', 'Código ESP32 - Sensores')
+
+@section('content')
+<div class="card">
+    <div class="card-header card-header-primary d-flex align-items-center justify-content-between">
+        <div>
+            <h4 class="card-title mb-0">Código para ESP32</h4>
+            <p class="card-category mb-0">Programá tu ESP32 con este código para enviar datos de sensores al sistema</p>
+        </div>
+        <a href="{{ route('sensor-dashboard') }}" class="btn btn-outline-light btn-sm">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info">
+            <strong><i class="fas fa-info-circle"></i> Instrucciones:</strong>
+            <ol class="mb-0 mt-2">
+                <li>Conectá los sensores MQ-7 (CO) al pin GPIO34 y MQ-135 (calidad de aire) al pin GPIO35</li>
+                <li>Conectá un buzzer al pin GPIO26</li>
+                <li>Cambiá <code>WIFI_SSID</code> y <code>WIFI_PASSWORD</code> con los datos de tu red WiFi</li>
+                <li>Cambiá <code>SERVIDOR</code> por la IP de este servidor (ej: 192.168.1.204)</li>
+                <li>El ESP32 enviará lecturas cada 10 segundos a <code>{{ url('api/sensor/esp32/recibir') }}</code></li>
+            </ol>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Código Fuente (Arduino IDE)</h5>
+            <a href="{{ asset('esp32/monitor_gases.ino') }}" class="btn btn-success" download>
+                <i class="fas fa-download"></i> Descargar .ino
+            </a>
+        </div>
+
+        <pre style="max-height: 600px; overflow-y: auto; background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; font-size: 13px; line-height: 1.5;"><code>// =============================================
 // Monitor de gases MQ-7 + MQ-135 + Buzzer
-// Mina Porco Illapa
+// Mina Porco Illapa - Integrador II
 // ESP32
 // =============================================
-
-#include <WiFi.h>
-#include <HTTPClient.h>
+// Configuración WiFi
+#include &lt;WiFi.h&gt;
+#include &lt;HTTPClient.h&gt;
 
 // ============ CONFIGURACIÓN ============
 const char* WIFI_SSID     = "AXS_2.4G_7FZKk3";
 const char* WIFI_PASSWORD = "se977KxA";
-const char* SERVIDOR      = "http://192.168.1.205";
+const char* SERVIDOR      = "http://192.168.1.205:8000";
 const char* ENDPOINT      = "/api/sensor/esp32/recibir";
 const char* DEVICE_ID     = "esp32_gases_01";
 // =======================================
@@ -24,8 +57,9 @@ const int PIN_BUZZ  = 26;
 const int UMBRAL_MQ7   = 2200;
 const int UMBRAL_MQ135 = 2850;
 
+// Tiempo entre envíos (milisegundos)
+const unsigned long INTERVALO_ENVIO = 10000; // 10 segundos
 unsigned long ultimoEnvio = 0;
-const unsigned long INTERVALO_ENVIO = 10000;
 
 void setup() {
     Serial.begin(115200);
@@ -36,8 +70,8 @@ void setup() {
     Serial.println("=================================");
     Serial.println(" SISTEMA DE MONITOREO MINERO");
     Serial.println("=================================");
-    Serial.println();
 
+    // Conectar WiFi
     Serial.print("Conectando a WiFi: ");
     Serial.println(WIFI_SSID);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -58,10 +92,8 @@ void setup() {
         Serial.println("ERROR: No se pudo conectar al WiFi");
     }
 
-    Serial.println("Calentando sensores...");
-    Serial.println("Espere 60 segundos");
+    Serial.println("Calentando sensores (60s)...");
     delay(60000);
-
     Serial.println("Monitoreo iniciado");
     Serial.println();
 }
@@ -104,6 +136,7 @@ void loop() {
         Serial.println("Ambiente normal");
     }
 
+    // Enviar datos al servidor cada INTERVALO_ENVIO ms
     if (millis() - ultimoEnvio >= INTERVALO_ENVIO) {
         enviarDatos(valMQ7, valMQ135, alerta);
         ultimoEnvio = millis();
@@ -148,3 +181,7 @@ void enviarDatos(int mq7, int mq135, bool alerta) {
 
     http.end();
 }
+</code></pre>
+    </div>
+</div>
+@endsection

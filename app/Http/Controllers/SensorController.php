@@ -94,6 +94,7 @@ class SensorController extends Controller
                   ->orWhere('device_id', 'like', 'esp32_%')
                   ->orWhere('device_id', 'like', 'ESP32%');
             })
+            ->where('device_id', '!=', 'esp32_config')
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();

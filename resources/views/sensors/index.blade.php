@@ -183,7 +183,6 @@ function actualizarUIEsp32(data) {
         }
     }
 }
-}
 
 function saveEsp32Config() {
     const ip = document.getElementById('esp32Ip').value.trim();

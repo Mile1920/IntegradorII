@@ -121,10 +121,14 @@ class FirebaseSensorController extends Controller
         }
 
         $esp32Mac = config('esp32.mac', env('ESP32_MAC', '00:4B:12:35:3E:00'));
-        $esp32Lecturas = \App\Models\SensorData::where(function ($q) use ($esp32Mac) {
+        $macClean = str_replace(':', '', $esp32Mac);
+        $esp32Lecturas = \App\Models\SensorData::where(function ($q) use ($esp32Mac, $macClean) {
                 $q->where('device_id', 'esp32_001')
+                  ->orWhere('device_id', 'esp32_gases_01')
                   ->orWhere('device_id', $esp32Mac)
-                  ->orWhere('device_id', 'ESP32-' . str_replace(':', '', $esp32Mac));
+                  ->orWhere('device_id', 'ESP32-' . $macClean)
+                  ->orWhere('device_id', 'like', 'esp32_%')
+                  ->orWhere('device_id', 'like', 'ESP32%');
             })
             ->orderBy('created_at', 'desc')
             ->limit(10)

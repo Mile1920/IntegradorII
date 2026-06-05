@@ -14,10 +14,14 @@ class Esp32SensorController extends Controller
         $ip = config('esp32.ip', env('ESP32_IP', '192.168.1.205'));
         $mac = config('esp32.mac', env('ESP32_MAC', '00:4B:12:35:3E:00'));
 
-        $lecturas = SensorData::where(function ($q) use ($mac) {
+        $macClean = str_replace(':', '', $mac);
+        $lecturas = SensorData::where(function ($q) use ($mac, $macClean) {
                 $q->where('device_id', 'esp32_001')
+                  ->orWhere('device_id', 'esp32_gases_01')
                   ->orWhere('device_id', $mac)
-                  ->orWhere('device_id', 'ESP32-' . str_replace(':', '', $mac));
+                  ->orWhere('device_id', 'ESP32-' . $macClean)
+                  ->orWhere('device_id', 'like', 'esp32_%')
+                  ->orWhere('device_id', 'like', 'ESP32%');
             })
             ->orderBy('created_at', 'desc')
             ->limit(50)
@@ -98,10 +102,14 @@ class Esp32SensorController extends Controller
 
         // El ESP32 no tiene servidor TCP activo. Solo envía datos via HTTP POST.
         // Verificamos si hay datos recientes en la BD (últimos 10 minutos).
-        $ultimoDato = SensorData::where(function ($q) use ($mac) {
+        $macClean = str_replace(':', '', $mac);
+        $ultimoDato = SensorData::where(function ($q) use ($mac, $macClean) {
                 $q->where('device_id', 'esp32_001')
+                  ->orWhere('device_id', 'esp32_gases_01')
                   ->orWhere('device_id', $mac)
-                  ->orWhere('device_id', 'ESP32-' . str_replace(':', '', $mac));
+                  ->orWhere('device_id', 'ESP32-' . $macClean)
+                  ->orWhere('device_id', 'like', 'esp32_%')
+                  ->orWhere('device_id', 'like', 'ESP32%');
             })
             ->orderBy('created_at', 'desc')
             ->first();
@@ -141,10 +149,14 @@ class Esp32SensorController extends Controller
         $minutosSinDatos = null;
 
         // Verificar si hay datos recientes en BD
-        $ultimoDato = SensorData::where(function ($q) use ($mac) {
+        $macClean = str_replace(':', '', $mac);
+        $ultimoDato = SensorData::where(function ($q) use ($mac, $macClean) {
                 $q->where('device_id', 'esp32_001')
+                  ->orWhere('device_id', 'esp32_gases_01')
                   ->orWhere('device_id', $mac)
-                  ->orWhere('device_id', 'ESP32-' . str_replace(':', '', $mac));
+                  ->orWhere('device_id', 'ESP32-' . $macClean)
+                  ->orWhere('device_id', 'like', 'esp32_%')
+                  ->orWhere('device_id', 'like', 'ESP32%');
             })
             ->orderBy('created_at', 'desc')
             ->first();

@@ -679,18 +679,10 @@ document.addEventListener('DOMContentLoaded', function() {
         showInfo(`Configuración para sensor ${sensorId} próximamente disponible.`);
     };
 
-    // ESP32: verificar estado al cargar
+    // ESP32: verificar estado al cargar y cada 15 segundos
     verificarEstadoEsp32();
-
-    // Auto-refresh cada 30 segundos
-    setInterval(() => {
-        // Solo refrescar si no hay filtros activos
-        if (!tipoFilter.value && !estadoFilter.value && !areaFilter.value) {
-            // Opcional: implementar actualización silenciosa
-        }
-    }, 30000);
-});
-</script>
+    setInterval(verificarEstadoEsp32, 15000);
+});</script>
 
 <script>
 // ESP32 funciones

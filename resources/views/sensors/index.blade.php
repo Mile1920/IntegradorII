@@ -217,6 +217,7 @@ function saveEsp32Config() {
 }
 
 verificarEstadoEsp32();
+setInterval(verificarEstadoEsp32, 15000);
 </script>
 @endpush
 @endsection

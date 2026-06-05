@@ -10,7 +10,7 @@
 // ============ CONFIGURACIÓN ============
 const char* WIFI_SSID     = "AXS_2.4G_7FZKk3";
 const char* WIFI_PASSWORD = "se977KxA";
-const char* SERVIDOR      = "http://192.168.1.205";
+const char* SERVIDOR = "http://192.168.1.205";
 const char* ENDPOINT      = "/api/sensor/esp32/recibir";
 const char* DEVICE_ID     = "esp32_gases_01";
 // =======================================

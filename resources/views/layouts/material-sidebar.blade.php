@@ -125,6 +125,9 @@
                         <img src="{{ asset('img/Logo.png') }}" alt="" class="icon-img">
                     </a>
                 </li>
+            @endif
+
+            <!-- Auditoría y Seguridad -->
             @if(auth()->user()->hasAnyRole(['administrador-principal', 'administrador-area', 'tecnico']))
                 <li class="nav-item {{ request()->routeIs('auditoria.*') ? 'active' : '' }}">
                     <a class="nav-link sidebar-link" href="{{ route('auditoria.index') }}">
@@ -133,6 +136,7 @@
                     </a>
                 </li>
             @endif
+
             @if(auth()->user()->hasRole('trabajador'))
                 <li class="nav-item {{ request()->routeIs('mi.ingreso.form') ? 'active' : '' }}">
                     <a class="nav-link sidebar-link" href="{{ route('mi.ingreso.form') }}">
@@ -164,6 +168,3 @@
         </ul>
     </div>
 </div>
-
-<form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-    @stack('scripts')

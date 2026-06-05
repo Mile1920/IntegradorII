@@ -119,9 +119,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/firebase-sensors', [App\Http\Controllers\FirebaseSensorController::class, 'store'])->name('firebase-sensors.store');
         Route::get('/firebase-sensors/{sensorId}', [App\Http\Controllers\FirebaseSensorController::class, 'show'])->name('firebase-sensors.show');
         Route::get('/sensor-dashboard', [App\Http\Controllers\FirebaseSensorController::class, 'dashboard'])->name('sensor-dashboard');
-        Route::get('/sensors/esp32-code', function () {
-            return view('sensors.esp32-code');
-        })->name('sensors.esp32-code');
         Route::get('/api/firebase-sensors', [App\Http\Controllers\FirebaseSensorController::class, 'apiData'])->name('api.firebase-sensors');
     });
 

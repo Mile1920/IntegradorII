@@ -1,6 +1,6 @@
 // =============================================
 // Monitor de gases MQ-7 + MQ-135 + Buzzer
-// Mina Porco Illapa - Integrador II
+// Mina Porco Illapa
 // ESP32
 // =============================================
 
@@ -24,9 +24,8 @@ const int PIN_BUZZ  = 26;
 const int UMBRAL_MQ7   = 2200;
 const int UMBRAL_MQ135 = 2850;
 
-// Tiempo entre envíos
-const unsigned long INTERVALO_ENVIO = 10000;
 unsigned long ultimoEnvio = 0;
+const unsigned long INTERVALO_ENVIO = 10000;
 
 void setup() {
     Serial.begin(115200);
@@ -37,6 +36,7 @@ void setup() {
     Serial.println("=================================");
     Serial.println(" SISTEMA DE MONITOREO MINERO");
     Serial.println("=================================");
+    Serial.println();
 
     Serial.print("Conectando a WiFi: ");
     Serial.println(WIFI_SSID);
@@ -58,9 +58,12 @@ void setup() {
         Serial.println("ERROR: No se pudo conectar al WiFi");
     }
 
-    Serial.println("Calentando sensores (60s)...");
+    Serial.println("Calentando sensores...");
+    Serial.println("Espere 60 segundos");
     delay(60000);
+
     Serial.println("Monitoreo iniciado");
+    Serial.println();
 }
 
 void loop() {

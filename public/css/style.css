@@ -707,6 +707,20 @@ footer {
     margin-right: 6px;
 }
 
+/* Sidebar link: text left, icon right */
+.sidebar .sidebar-link {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+.sidebar .sidebar-link span {
+    flex: 1;
+}
+.sidebar .sidebar-link .icon-img {
+    margin-right: 0 !important;
+    margin-left: 8px;
+}
+
 /* FIX: Dropdown and Alert visibility in dark mode */
 .dark-edition select.form-control {
     background-color: #343a40 !important;

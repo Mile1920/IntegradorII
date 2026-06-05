@@ -160,6 +160,9 @@
                                     <button class="btn btn-danger btn-sm" onclick="desconectarEsp32()">
                                         <i class="fas fa-power-off"></i> Desconectar
                                     </button>
+                                    <a href="{{ route('sensors.esp32-code') }}" class="btn btn-info btn-sm" target="_blank">
+                                        <i class="fas fa-code"></i> Código ESP32
+                                    </a>
                                 </div>
                             </div>
                             <div class="card-body">
